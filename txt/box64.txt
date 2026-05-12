@@ -6,15 +6,19 @@ export LDFLAGS="-s -Wl,--dynamic-linker=/data/data/com.winlator/files/imagefs/us
 
 
 cmake .. \
-    -D CMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-    -D CMAKE_SYSROOT=/data/data/com.winlator/files/imagefs \
-    -D CMAKE_FIND_ROOT_PATH="/data/data/com.winlator/files/imagefs/usr" \
-    -D CMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
-    -D CMAKE_BUILD_TYPE=RelWithDebInfo \
-    -D ARM64=ON \
-    -D ARM_DYNAREC=ON \
-    -D BAD_SIGNAL=ON \
-    -D WINLATOR_GLIBC=ON
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DARM64=ON \
+    -DARM_DYNAREC=ON \
+    -DBAD_SIGNAL=ON \
+    -DWINLATOR_GLIBC=ON \
+    -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+    -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+    -DCMAKE_SYSTEM_NAME=Linux \
+    -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+    -DCMAKE_CROSSCOMPILING=TRUE
+
 
 make -j$(nproc)
-make install
+make install DESTDIR=$PWD/package
+
+# 编译好后请手动将package中的box64-x86_64-linux-gnu移动至目标rootfs中
