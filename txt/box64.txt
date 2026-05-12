@@ -2,6 +2,9 @@ git clone https://github.com/ptitSeb/box64.git
 cd box64
 mkdir build && cd build
 
+export LDFLAGS="-s -Wl,--dynamic-linker=/data/data/com.winlator/files/imagefs/usr/lib/ld-linux-aarch64.so.1 -Wl,-rpath=/data/data/com.winlator/files/imagefs/usr/lib"
+
+
 cmake .. \
     -D CMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
     -D CMAKE_SYSROOT=/data/data/com.winlator/files/imagefs \
