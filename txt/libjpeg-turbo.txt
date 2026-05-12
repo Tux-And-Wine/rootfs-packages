@@ -1,0 +1,26 @@
+wget https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.0/libjpeg-turbo-3.1.0.tar.gz
+tar -xzf libjpeg-turbo-3.1.0.tar.gz
+cd libjpeg-turbo-3.1.0
+
+cat > toolchain-aarch64.cmake << 'EOF'
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+set(CMAKE_SYSROOT /data/data/com.winlator/files/imagefs)
+set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+set(CMAKE_FIND_ROOT_PATH /data/data/com.winlator/files/imagefs/usr)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+EOF
+
+cmake -B build \
+    -DCMAKE_TOOLCHAIN_FILE=toolchain-aarch64.cmake \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    -DENABLE_SHARED=ON \
+    -DENABLE_STATIC=OFF \
+    -DWITH_JPEG8=ON
+
+cmake --build build --parallel $(nproc)
+cmake --install build
+cd ..

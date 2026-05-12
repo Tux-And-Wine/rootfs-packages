@@ -1,0 +1,27 @@
+wget https://github.com/curl/curl/releases/download/curl-8_12_1/curl-8.12.1.tar.xz
+tar -xf curl-8.12.1.tar.xz
+cd curl-8.12.1
+
+sed -i 's/cross_compiling=no/cross_compiling=yes/' configure
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --with-openssl \
+    --with-nghttp2 \
+    --with-zlib \
+    --with-libssh2 \
+    --with-brotli \
+    --with-libpsl \
+    --without-gssapi \
+    --disable-ldap \
+    --disable-ldaps \
+    --enable-ipv6 \
+    --with-ca-bundle=/data/data/com.winlator/files/imagefs/usr/etc/ssl/certs/ca-certificates.crt \
+    --with-ca-path=/data/data/com.winlator/files/imagefs/usr/etc/ssl/certs
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+

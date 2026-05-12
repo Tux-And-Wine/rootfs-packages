@@ -1,0 +1,17 @@
+# 下载并解压
+wget https://xorg.freedesktop.org/releases/individual/lib/libXext-1.3.6.tar.xz
+tar -xf libXext-1.3.6.tar.xz
+cd libXext-1.3.6
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译与安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

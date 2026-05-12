@@ -1,0 +1,15 @@
+wget https://www.libssh2.org/download/libssh2-1.11.1.tar.gz
+tar -xzf libssh2-1.11.1.tar.gz
+cd libssh2-1.11.1
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --with-openssl \
+    --without-libgcrypt
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

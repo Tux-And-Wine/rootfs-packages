@@ -1,0 +1,15 @@
+# 1. 下载并解压
+wget https://github.com/lz4/lz4/archive/v1.10.0.tar.gz -O lz4-1.10.0.tar.gz
+tar -xzf lz4-1.10.0.tar.gz
+cd lz4-1.10.0
+
+# 2. 交叉编译（只编译库，不编译程序）
+make -j$(nproc) \
+    CC=aarch64-linux-gnu-gcc \
+    AR=aarch64-linux-gnu-ar \
+    RANLIB=aarch64-linux-gnu-ranlib \
+    PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    lib
+
+# 3. 安装库和头文件（同时生成 .pc 文件）
+make install PREFIX=/data/data/com.winlator/files/imagefs/usr

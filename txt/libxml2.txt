@@ -1,0 +1,19 @@
+wget https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.6.tar.xz
+tar -xf libxml2-2.13.6.tar.xz
+cd libxml2-2.13.6
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --with-zlib=/data/data/com.winlator/files/imagefs/usr \
+    --with-lzma=/data/data/com.winlator/files/imagefs/usr \
+    --with-iconv=/data/data/com.winlator/files/imagefs/usr \
+    --without-icu \
+    --with-history \
+    --with-threads \
+    --without-python
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"

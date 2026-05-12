@@ -1,0 +1,52 @@
+# 1. 下载源码
+wget https://fossies.org/linux/misc/bzip2-1.0.8.tar.xz
+tar -xf bzip2-1.0.8.tar.xz
+cd bzip2-1.0.8
+
+# 2. 补丁：让主 Makefile 从环境变量获取 CC/AR/RANLIB/PREFIX
+sed -i 's/^CC=gcc/## CC=gcc/' Makefile
+sed -i 's/^AR=ar/## AR=ar/' Makefile
+sed -i 's/^RANLIB=ranlib/## RANLIB=ranlib/' Makefile
+sed -i 's/^LDFLAGS=/## LDFLAGS=/' Makefile
+sed -i 's/^PREFIX=\/usr\/local/## PREFIX=\/usr\/local/' Makefile
+
+# 3. 补丁：让 Makefile-libbz2_so 同样支持环境变量
+sed -i 's/^CC=gcc/CC ?= gcc/' Makefile-libbz2_so
+sed -i 's/^CFLAGS=/CFLAGS ?=/' Makefile-libbz2_so
+# 让链接步骤带上 LDFLAGS（原始没有）
+sed -i 's/$(CC) -shared -Wl,-soname/$(CC) $(LDFLAGS) -shared -Wl,-soname/' Makefile-libbz2_so
+sed -i 's/$(CC) $(CFLAGS) -o bzip2-shared/$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2-shared/' Makefile-libbz2_so
+
+# 4. 修正 man 路径（放到 share/man 下）
+sed -i 's@(PREFIX)/man@(PREFIX)/share/man@g' Makefile
+
+# 5. 设置交叉编译器环境变量
+export CC=aarch64-linux-gnu-gcc
+export AR=aarch64-linux-gnu-ar
+export RANLIB=aarch64-linux-gnu-ranlib
+export CFLAGS="-O3 -pipe -fPIC"
+export LDFLAGS=""
+
+# 6. 编译共享库和工具
+make -f Makefile-libbz2_so
+make bzip2 bzip2recover PREFIX=/data/data/com.winlator/files/imagefs/usr
+
+# 7. 安装（手动，照着 Termux 方式）
+PREFIX=/data/data/com.winlator/files/imagefs/usr
+install -dm755 $PREFIX/share/man/man1
+
+install -m755 bzip2-shared $PREFIX/bin/bzip2
+install -m755 bzip2recover bzdiff bzgrep bzmore $PREFIX/bin
+ln -sf bzip2 $PREFIX/bin/bunzip2
+ln -sf bzip2 $PREFIX/bin/bzcat
+
+cp -a libbz2.so* $PREFIX/lib
+ln -sf libbz2.so.1.0.8 $PREFIX/lib/libbz2.so
+ln -sf libbz2.so.1.0.8 $PREFIX/lib/libbz2.so.1
+
+install -m644 bzlib.h $PREFIX/include/
+
+install -m644 bzip2.1 $PREFIX/share/man/man1/
+ln -sf bzip2.1 $PREFIX/share/man/man1/bunzip2.1
+ln -sf bzip2.1 $PREFIX/share/man/man1/bzcat.1
+ln -sf bzip2.1 $PREFIX/share/man/man1/bzip2recover.1

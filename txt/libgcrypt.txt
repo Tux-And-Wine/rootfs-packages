@@ -1,0 +1,56 @@
+# 1. 下载并解压
+wget https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2
+tar -xf libgcrypt-1.11.0.tar.bz2
+cd libgcrypt-1.11.0
+
+# 2. 应用路径补丁（替换 /etc/gcrypt 为安卓下的实际路径）
+sed -i 's|/etc/gcrypt/random.conf|/data/data/com.winlator/files/imagefs/usr/etc/gcrypt/random.conf|g' random/random.c
+sed -i 's|/etc/gcrypt/fips_enabled|/data/data/com.winlator/files/imagefs/usr/etc/gcrypt/fips_enabled|g' src/fips.c
+sed -i 's|/etc/gcrypt/hwf.deny|/data/data/com.winlator/files/imagefs/usr/etc/gcrypt/hwf.deny|g' src/hwfeatures.c
+
+# 3. 添加安卓/Termux 的随机源（直接插入到 dataSources 数组前面）
+sed -i '/dataSources\[\] = {/a \
+    // Android sources \
+    {   "/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },\
+    {   "/system/xbin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },\
+    {   "/system/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },\
+    {   "/system/xbin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },\
+    {   "/system/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },\
+    {   "/system/xbin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },\
+    {   "/system/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },\
+    {   "/system/xbin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },\
+    {   "/system/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },\
+    {   "/system/xbin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },\
+    {   "/system/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },\
+    {   "/system/xbin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1  },\
+    {   "/system/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },\
+    {   "/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1      },\
+    {   "/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1       },\
+    {   "/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1      },\
+    // Termux sources \
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1 },\
+    {   "/data/data/com.winlator/files/imagefs/usr/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1 },' random/rndunix.c
+
+# 4. 重新生成构建系统（Termux 同款）
+autoreconf -vfi
+
+# 5. 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib" \
+    --disable-padlock-support \
+    --disable-static
+# 6. 编译
+make -j$(nproc)
+
+# 7. 安装（避免宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

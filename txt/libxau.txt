@@ -1,0 +1,17 @@
+# 1. 下载并解压
+wget https://xorg.freedesktop.org/releases/individual/lib/libXau-1.0.12.tar.xz
+tar -xf libXau-1.0.12.tar.xz
+cd libXau-1.0.12
+
+# 2. 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+# 3. 编译
+make -j$(nproc)
+
+# 4. 安装（防宿主 strip）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

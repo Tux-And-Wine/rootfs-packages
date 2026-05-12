@@ -1,0 +1,23 @@
+# 从 SourceForge 官方源下载
+wget https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz
+
+# 解压
+tar -xzf giflib-5.2.2.tar.gz
+cd giflib-5.2.2
+
+# 打补丁1：Makefile 使用环境变量中的 PREFIX
+sed -i 's/^PREFIX = \/usr\/local/PREFIX ?= \/usr\/local/' Makefile
+
+# 打补丁2：doc/Makefile 跳过 html 文档生成，只编译 man 手册
+sed -i 's/^all: allhtml manpages/all: manpages/' doc/Makefile
+
+# 交叉编译
+make -j$(nproc) \
+    CC=aarch64-linux-gnu-gcc \
+    AR=aarch64-linux-gnu-ar \
+    RANLIB=aarch64-linux-gnu-ranlib \
+    PREFIX=/data/data/com.winlator/files/imagefs/usr
+
+# 安装
+make install \
+    PREFIX=/data/data/com.winlator/files/imagefs/usr

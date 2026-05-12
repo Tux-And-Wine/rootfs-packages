@@ -1,0 +1,33 @@
+# 下载并解压
+wget https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+tar -xzf lame-3.100.tar.gz
+cd lame-3.100
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译并安装（防宿主 strip）
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+
+# 创建 pkg-config 文件（官方源码不提供，手动生成）
+cat > /data/data/com.winlator/files/imagefs/usr/lib/pkgconfig/lame.pc << 'EOF'
+prefix=/data/data/com.winlator/files/imagefs/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: lame
+Description: MP3 encoding library
+Requires:
+Version: 3.100
+Libs: -L${libdir} -lmp3lame
+Cflags: -I${includedir}
+EOF
+
+cd ..

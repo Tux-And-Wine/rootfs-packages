@@ -1,0 +1,20 @@
+wget https://linux.thai.net/pub/thailinux/software/libthai/libthai-0.1.29.tar.xz
+tar -xf libthai-0.1.29.tar.xz
+cd libthai-0.1.29
+
+# 设置 pkg-config 搜索路径
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --disable-dict \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib"
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

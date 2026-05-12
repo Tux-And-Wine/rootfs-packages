@@ -1,0 +1,32 @@
+# 1. 下载并解压
+wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz
+tar -xzf libiconv-1.18.tar.gz
+cd libiconv-1.18
+
+# 2. 配置：将可执行文件和头文件安装到临时子目录，避免立即覆盖系统 iconv
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --bindir=/data/data/com.winlator/files/imagefs/usr/bin/libiconv-d \
+    --includedir=/data/data/com.winlator/files/imagefs/usr/include/libiconv-d \
+    --enable-extra-encodings
+
+# 3. 编译
+make -j$(nproc)
+
+# 4. 安装（防止宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+
+# 5. 安装后处理：重命名并移动文件（模拟 termux_step_post_make_install）
+cd /data/data/com.winlator/files/imagefs/usr
+
+# 重命名可执行文件 iconv -> libiconv，并移到 bin/
+mv bin/libiconv-d/iconv bin/libiconv-d/libiconv
+mv bin/libiconv-d/libiconv bin/
+rm -rf bin/libiconv-d
+
+# 重命名头文件 iconv.h -> libiconv.h，并移到 include/
+mv include/libiconv-d/iconv.h include/libiconv-d/libiconv.h
+mv include/libiconv-d/* include/
+rm -rf include/libiconv-d

@@ -1,0 +1,19 @@
+# 1. 下载并解压
+wget https://mirrors.kernel.org/gnu/libidn/libidn2-2.3.7.tar.gz
+tar -xzf libidn2-2.3.7.tar.gz
+cd libidn2-2.3.7
+
+# 2. 配置（显式指定 libunistring 的路径）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib"
+
+# 3. 编译
+make -j$(nproc)
+
+# 4. 安装（防宿主 strip）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

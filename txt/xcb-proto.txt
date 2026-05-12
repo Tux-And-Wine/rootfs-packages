@@ -1,0 +1,18 @@
+wget https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz
+tar -xf xcb-proto-1.17.0.tar.xz
+cd xcb-proto-1.17.0
+
+# 直接用宿主机 python3 安装，因为这个包只生成 Python 模块和 XML 数据
+# 手动创建 pythondir 避免安装到宿主机系统目录
+mkdir -p /tmp/xcbgen-install
+
+./configure \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    PYTHON=python3 \
+    am_cv_python_pythondir=/tmp/xcbgen-install
+
+make install
+# 把 Python 模块拷贝到 sysroot 里（给后续 libxcb 用）
+mkdir -p /data/data/com.winlator/files/imagefs/usr/lib/python3/dist-packages
+cp -r /tmp/xcbgen-install/xcbgen /data/data/com.winlator/files/imagefs/usr/lib/python3/dist-packages/
+cd ..

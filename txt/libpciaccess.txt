@@ -1,0 +1,17 @@
+# 下载并解压
+wget https://xorg.freedesktop.org/releases/individual/lib/libpciaccess-0.17.tar.xz
+tar -xf libpciaccess-0.17.tar.xz
+cd libpciaccess-0.17
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译 & 安装（避免宿主 strip 报错）
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

@@ -1,0 +1,11 @@
+# 下载并解压
+wget https://github.com/KhronosGroup/Vulkan-Headers/archive/v1.4.309.tar.gz -O vulkan-headers-1.4.309.tar.gz
+tar -xzf vulkan-headers-1.4.309.tar.gz
+cd Vulkan-Headers-1.4.309
+
+# 配置并安装（纯头文件，无需交叉编译工具链）
+cmake -B build \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr
+
+cmake --install build
+cd ..

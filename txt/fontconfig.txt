@@ -1,0 +1,66 @@
+# 下载并解压
+wget https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.15.0/fontconfig-2.15.0.tar.gz
+tar -xzf fontconfig-2.15.0.tar.gz
+cd fontconfig-2.15.0
+
+#创建补丁
+cat > fcatomic.patch << 'EOF'
+--- a/src/fcatomic.c
++++ b/src/fcatomic.c
+@@ -130,15 +130,12 @@
+ 	unlink ((char *) atomic->tmp);
+ 	return FcFalse;
+     }
+-    ret = link ((char *) atomic->tmp, (char *) atomic->lck);
+-    if (ret < 0 && (errno == EPERM || errno == ENOTSUP || errno == EACCES))
+-    {
++
+ 	/* the filesystem where atomic->lck points to may not supports
+ 	 * the hard link. so better try to fallback
+ 	 */
+ 	ret = mkdir ((char *) atomic->lck, 0600);
+ 	no_link = FcTrue;
+-    }
+     (void) unlink ((char *) atomic->tmp);
+ #else
+     ret = mkdir ((char *) atomic->lck, 0600);
+EOF
+
+# 打补丁
+patch -p1 < fcatomic.patch
+
+# 创建 Meson 交叉编译描述文件
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+# 设置 pkg-config 搜索路径
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+# 配置（适配安卓字体路径）
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    -Ddefault-fonts-dirs=/system/fonts,/data/data/com.winlator/files/imagefs/usr/share/fonts \
+    -Ddefault-hinting=slight \
+    -Ddefault-sub-pixel-rendering=rgb \
+    -Ddoc-html=disabled \
+    -Ddoc-pdf=disabled \
+    -Ddoc-txt=disabled
+
+# 编译 & 安装
+meson compile -C builddir
+meson install -C builddir
+cd ..

@@ -1,0 +1,19 @@
+# 下载并解压
+wget https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.1.tar.xz
+tar -xf mpfr-4.2.1.tar.xz
+cd mpfr-4.2.1
+
+# 配置（指定 libgmp 的位置）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib"
+
+# 编译
+make -j$(nproc)
+
+# 安装（避免宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

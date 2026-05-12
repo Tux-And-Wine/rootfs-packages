@@ -1,0 +1,29 @@
+wget https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz
+tar -xf openssl-3.4.1.tar.gz
+cd openssl-3.4.1
+
+./Configure linux-aarch64 \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --openssldir=/data/data/com.winlator/files/imagefs/usr/etc/ssl \
+    --libdir=/data/data/com.winlator/files/imagefs/usr/lib \
+    shared \
+    enable-ktls \
+    no-afalgeng
+
+# 修改所有交叉工具为确切的名称
+sed -i 's/^CC=.*/CC= aarch64-linux-gnu-gcc/' Makefile
+sed -i 's/^AR=.*/AR= aarch64-linux-gnu-ar/' Makefile
+sed -i 's/^AS=.*/AS= aarch64-linux-gnu-as/' Makefile
+sed -i 's/^LD=.*/LD= aarch64-linux-gnu-ld/' Makefile
+sed -i 's/^NM=.*/NM= aarch64-linux-gnu-nm/' Makefile
+sed -i 's/^RANLIB=.*/RANLIB= aarch64-linux-gnu-ranlib/' Makefile
+sed -i 's/^STRIP=.*/STRIP= aarch64-linux-gnu-strip/' Makefile
+# 同时清空 CROSS_COMPILE，防止其他地方再拼接
+sed -i 's/^CROSS_COMPILE=.*/CROSS_COMPILE=/' Makefile
+
+make depend          # 生成依赖
+make -j$(nproc)      # 并行编译
+make install \
+    MANDIR=/data/data/com.winlator/files/imagefs/usr/share/man \
+    MANSUFFIX=ssl \
+    install_sw install_ssldirs install_man_docs

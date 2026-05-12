@@ -1,0 +1,38 @@
+# 1. 下载并解压
+wget https://www.cl.cam.ac.uk/~mgk25/download/jbigkit-2.1.tar.gz
+tar -xzf jbigkit-2.1.tar.gz
+cd jbigkit-2.1
+
+# 2. 打安全补丁：限制最大解码图像大小，防止内存耗尽攻击
+sed -i '/^  s->xmax = 4294967295UL;/a\  s->maxmem = 2000000000;' libjbig/jbig.c
+sed -i '/^    s->options = s->buffer\[19\];/a\    if (s->maxmem / s->planes / s->yd / jbg_ceil_half(s->xd, 3) == 0)\n      return JBG_ENOMEM;' libjbig/jbig.c
+sed -i '/^  int dmax;/a\  size_t maxmem;' libjbig/jbig.h
+
+# 3. 手动编译共享库（跳过复杂的 Makefile 修改）
+cd libjbig
+aarch64-linux-gnu-gcc -O3 -pipe -fPIC -shared -Wl,-soname,libjbig.so.2.1 -o libjbig.so.2.1 jbig.c jbig_ar.c
+aarch64-linux-gnu-gcc -O3 -pipe -fPIC -shared -Wl,-soname,libjbig85.so.2.1 -o libjbig85.so.2.1 jbig85.c jbig_ar.c
+cd ..
+
+# 4. 安装头文件、库文件和符号链接
+install -vDm 644 libjbig/*.h -t /data/data/com.winlator/files/imagefs/usr/include/
+install -vDm 755 libjbig/libjbig.so.2.1 -t /data/data/com.winlator/files/imagefs/usr/lib/
+install -vDm 755 libjbig/libjbig85.so.2.1 -t /data/data/com.winlator/files/imagefs/usr/lib/
+ln -sf libjbig.so.2.1 /data/data/com.winlator/files/imagefs/usr/lib/libjbig.so
+ln -sf libjbig85.so.2.1 /data/data/com.winlator/files/imagefs/usr/lib/libjbig85.so
+
+# 5. 创建 pkg-config 文件（供 libtiff 等依赖查找）
+cat > /data/data/com.winlator/files/imagefs/usr/lib/pkgconfig/jbigkit.pc << 'EOF'
+prefix=/data/data/com.winlator/files/imagefs/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: jbigkit
+Description: JBIG-KIT data compression library
+Version: 2.1
+Libs: -L${libdir} -ljbig
+Cflags: -I${includedir}
+EOF
+
+cd ..

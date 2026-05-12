@@ -1,0 +1,13 @@
+wget https://xorg.freedesktop.org/archive/individual/lib/libXdmcp-1.1.5.tar.xz
+tar -xf libXdmcp-1.1.5.tar.xz
+cd libXdmcp-1.1.5
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

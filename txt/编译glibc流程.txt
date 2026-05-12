@@ -1,0 +1,242 @@
+配置环境
+sudo apt update
+sudo apt install -y build-essential gettext bison flex python3 texinfo gawk sed \
+  grep bash perl jq git wget \
+gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+克隆termux-glibc的仓库，准备好一些为安卓定制的源码和补丁
+cd /opt
+git clone https://github.com/termux-pacman/glibc-packages.git
+
+下载glibc源码，和shm源码和头文件
+cd /opt
+wget https://ftp.gnu.org/gnu/libc/glibc-2.42.tar.xz
+git clone https://github.com/moze30/winlator-wcp.git
+tar xvf glibc-2.42.tar.xz
+
+——————————————————————————————说明——————————————————————————————
+在我的版本中，安装了arm64的交叉编译工具链之后编译glibc时所需要的头文件是完整的，如果遇到了头文件不完整的情况就要下载头文件安装
+cd /opt
+wget https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.18.7.tar.xz
+tar xvf linux-6.18.7.tar.xz
+cd linux-6.18.7
+make mrproper
+安装头文件
+make headers_install ARCH=arm64 INSTALL_HDR_PATH=/opt/tools
+（默认头文件压缩包会自动帮你创建include文件夹，安装过程和到时候指定位置请多注意这个特性。头文件安装位置自行决定，建议不要安装到系统中导致污染，安装好头文件后只需要在编译glibc过程中定义编译参数阶段指定对位置就行）
+
+删除不需要的目录（可选，看个人习惯，删不删都行）
+rm -rf /opt/tools/include/drm
+
+指定头文件路径
+如果遇到了头文件缺失需要指定头文件的请自行将这个参数加入到你的编译参数配置中，因为我不需要指定头文件所以在下面的步骤中我并没有将指定头文件部分加入其中
+--with-headers=/opt/tools/include
+——————————————————————————————————————————————————————————————
+
+解压好glibc源码到/opt中
+cd /opt/glibc-2.42
+
+
+应用补丁，当前办法排除了修改路径的特定补丁，后期有需要就改
+for patch in /opt/glibc-packages/gpkg/glibc/*.patch; do
+    if [[ "$patch" != *"set-dirs.patch" ]]; then
+        echo "Applying $(basename $patch)"
+        patch -p1 < "$patch"
+    fi
+done
+
+
+
+复制termux-glibc仓库中的文件到glibc源码中准备编译
+cp /opt/glibc-packages/gpkg/glibc/{shmat.c,shmctl.c,shmdt.c,shmget.c,mprotect.c,syscall.c,fakesyscall*.h,fake_epoll_pwait2.c,setfsuid.c,setfsgid.c} \
+    sysdeps/unix/sysv/linux/
+cp /opt/glibc-packages/gpkg/glibc/{android_passwd_group.c,android_passwd_group.h,android_system_user_ids.h} \
+    nss/
+cp /opt/glibc-packages/gpkg/glibc/syslog.c misc/
+cp /opt/glibc-packages/gpkg/glibc/{shmem-android.c,shmem-android.h} sysvipc/
+
+
+将shm部分替换为winlator官方仓库的源码与头文件
+cp /opt/winlator-wcp/glibc_patches/{shmat.c,shmctl.c,shmdt.c,shmget.c,android_sysvshm.c,android_sysvshm.h} \
+    sysdeps/unix/sysv/linux/
+cp /opt/winlator-wcp/glibc_patches/android_sysvshm.c sysvipc/
+cp /opt/winlator-wcp/glibc_patches/android_sysvshm.h sysvipc/
+cd sysvipc
+
+手动修改源码
+nano Makefile
+为源码添加android_sysvshm编译选项
+cd ..
+
+
+
+
+
+生成android_ids.h，使用了源码中的脚本生成，如果有需求后期需要研究或修改那个脚本
+bash /opt/glibc-packages/gpkg/glibc/gen-android-ids.sh \
+    /opt/glibc-packages \
+    nss/android_ids.h \
+    /opt/glibc-packages/gpkg/glibc/android_system_user_ids.h
+
+
+
+删除不兼容文件（仅 aarch64）
+rm -f sysdeps/unix/sysv/linux/aarch64/clone3.S
+
+
+
+重命名文件
+cd sysdeps/unix/sysv/linux/aarch64
+mv syscall.S syscallS.S
+
+
+
+创建disabled-syscall.h源码文件（为解决jq解析和脚本生成问题，直接提取termux构建系统中成功构建后的源码文件）
+cat > disabled-syscall.h << 'EOF'
+#define __NR_accept 202
+#define __NR_faccessat2 439
+#define __NR_fchmodat2 452
+#define __NR_epoll_pwait2 441
+#define __NR_statx 291
+#define __NR_close_range 436
+#define __NR_shmat 196
+#define __NR_shmctl 195
+#define __NR_shmdt 197
+#define __NR_shmget 194
+#define __NR_setuid 146
+#define __NR_setgid 144
+#define __NR_setreuid 145
+#define __NR_setregid 143
+#define __NR_setresuid 147
+#define __NR_setresgid 149
+#define __NR_setfsuid 151
+#define __NR_setfsgid 152
+#define __NR_clone3 435
+#define __NR_futex_waitv 449
+#define __NR_landlock_create_ruleset 444
+#define __NR_pidfd_send_signal 424
+#define __NR_rseq 293
+#define __NR_set_robust_list 99
+#define __NR_get_robust_list 100
+#define __NR_io_uring_setup 425
+#define __NR_io_uring_enter 426
+#define __NR_io_uring_register 427
+#define __NR_name_to_handle_at 264
+#define __NR_open_by_handle_at 265
+#define __NR_kcmp 272
+#define __NR_mbind 235
+#define __NR_get_mempolicy 236
+#define __NR_set_mempolicy 237
+#define __NR_mq_open 180
+#define __NR_rt_sigreturn 139
+#define __NR_semget 190
+#define __NR_semctl 191
+#define __NR_semop 193
+#define __NR_semtimedop 192
+#define __NR_msgctl 187
+#define __NR_msgget 186
+#define __NR_msgrcv 188
+#define __NR_msgsnd 189
+
+#define DISABLED_SYSCALL_WITH_FAKESYSCALL \
+        case __NR_shmat: \
+                return (long int)shmat(a0, (const void *)a1, a2); \
+        case __NR_setuid: \
+        case __NR_setgid: \
+        case __NR_setreuid: \
+        case __NR_setregid: \
+        case __NR_setresuid: \
+        case __NR_setresgid: \
+        case __NR_setfsuid: \
+        case __NR_setfsgid: \
+        case 1008: \
+                return 0; \
+        case __NR_clone3: \
+        case __NR_futex_waitv: \
+        case __NR_landlock_create_ruleset: \
+        case __NR_pidfd_send_signal: \
+        case __NR_rseq: \
+        case __NR_set_robust_list: \
+        case __NR_get_robust_list: \
+        case __NR_io_uring_setup: \
+        case __NR_io_uring_enter: \
+        case __NR_io_uring_register: \
+        case __NR_name_to_handle_at: \
+        case __NR_open_by_handle_at: \
+        case __NR_kcmp: \
+        case __NR_mbind: \
+        case __NR_get_mempolicy: \
+        case __NR_set_mempolicy: \
+        case __NR_mq_open: \
+        case __NR_rt_sigreturn: \
+        case __NR_semget: \
+        case __NR_semctl: \
+        case __NR_semop: \
+        case __NR_semtimedop: \
+        case __NR_msgctl: \
+        case __NR_msgget: \
+        case __NR_msgrcv: \
+        case __NR_msgsnd: \
+                return INLINE_SYSCALL_ERROR_RETURN_VALUE(ENOSYS); \
+        case __NR_accept: \
+                return accept4(a0, (struct sockaddr *)a1, (socklen_t *)a2, 0); \
+        case __NR_close_range: \
+                return close_range(a0, a1, a2); \
+        case __NR_faccessat2: \
+                return faccessat(a0, (const char *)a1, a2, a3); \
+        case __NR_epoll_pwait2: \
+                return fake_epoll_pwait2(a0, (struct epoll_event *)a1, a2, (const struct __timespec64 *)a3, (const __sigset_t *)a4, a5); \
+        case __NR_fchmodat2: \
+                return fchmodat(a0, (const char*)a1, a2, a3); \
+        case __NR_shmctl: \
+                return shmctl(a0, a1, (struct shmid_ds *)a2); \
+        case __NR_shmdt: \
+                return shmdt((const void *)a0); \
+        case __NR_shmget: \
+                return shmget(a0, a1, a2); \
+        case __NR_statx: \
+                return statx_generic(a0, (const char *)a1, a2, a3, (struct statx *)a4);
+EOF
+
+
+
+
+手动修改posix的路径
+nano /opt/glibc-2.42/include/shm-directory.h
+把
+#define SHMDIR _PATH_DEV "shm/"
+改成
+#define SHMDIR "/data/user/0/com.winlator/files/imagefs/tmp/"
+
+
+
+
+回到glibc源码目录，给编译参数开始编译
+cd /opt/glibc-2.42
+mkdir build && cd build
+../configure \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --libdir=/data/data/com.winlator/files/imagefs/usr/lib \
+    --libexecdir=/data/data/com.winlator/files/imagefs/usr/libexec \
+    --includedir=/data/data/com.winlator/files/imagefs/usr/include \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --target=aarch64-linux-gnu \
+    --with-bugurl=https://github.com/moze30/winlator-glibc/issues \
+    --with-pkgversion="GNU libc for Winlator-Glibc" \
+    --enable-bind-now \
+    --enable-fortify-source \
+    --disable-multi-arch \
+    --enable-stack-protector=strong \
+    --disable-systemtap \
+    --disable-nscd \
+    --disable-profile \
+    --disable-werror \
+    --disable-default-pie \
+    --enable-memory-tagging
+
+开始编译
+make -j$(nproc)
+安装到临时目录
+make install DESTDIR=$PWD/package
+自行打包

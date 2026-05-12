@@ -1,0 +1,15 @@
+cd /opt
+
+# 下载 vulkan-sdk-1.4.341.0 对应的 SPIRV-Headers
+wget https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/vulkan-sdk-1.4.341.0.tar.gz -O spirv-headers-1.4.341.0.tar.gz
+
+# 解压
+tar -xzf spirv-headers-1.4.341.0.tar.gz
+cd SPIRV-Headers-vulkan-sdk-1.4.341.0
+
+# 安装头文件到 sysroot (这是纯头文件，不需要交叉编译)
+cmake -B build \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr
+
+cmake --install build
+cd ..

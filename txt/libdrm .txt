@@ -1,0 +1,47 @@
+# 下载并解压
+wget https://dri.freedesktop.org/libdrm/libdrm-2.4.124.tar.xz
+tar -xf libdrm-2.4.124.tar.xz
+cd libdrm-2.4.124
+
+# 创建 Meson 交叉编译描述文件
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+# 设置 pkg-config 搜索路径
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+# 配置 (Meson)
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    -Dudev=false \
+    -Dvalgrind=disabled \
+    -Dinstall-test-programs=true \
+    -Domap=enabled \
+    -Dexynos=enabled \
+    -Dtegra=enabled \
+    -Detnaviv=enabled \
+    -Dfreedreno-kgsl=true \
+    -Dintel=disabled \
+    -Dradeon=disabled \
+    -Damdgpu=disabled \
+    -Dnouveau=disabled \
+    -Dvmwgfx=disabled
+
+# 编译 & 安装
+meson compile -C builddir
+meson install -C builddir
+cd ..

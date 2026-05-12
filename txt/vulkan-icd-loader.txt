@@ -1,0 +1,37 @@
+# 下载并解压
+wget https://github.com/KhronosGroup/Vulkan-Loader/archive/v1.3.301.tar.gz -O vulkan-loader-1.3.301.tar.gz
+tar -xzf vulkan-loader-1.3.301.tar.gz
+cd Vulkan-Loader-1.3.301
+
+# 创建交叉编译工具链文件
+cat > toolchain-aarch64.cmake << 'EOF'
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+set(CMAKE_SYSROOT /data/data/com.winlator/files/imagefs)
+set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+set(CMAKE_FIND_ROOT_PATH /data/data/com.winlator/files/imagefs/usr)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+EOF
+
+# 创建构建目录
+mkdir build && cd build
+
+# 配置（关闭 Wayland 支持，因为我们还没装）
+cmake .. \
+    -DCMAKE_TOOLCHAIN_FILE=../toolchain-aarch64.cmake \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    -DVULKAN_HEADERS_INSTALL_DIR=/data/data/com.winlator/files/imagefs/usr \
+    -DFALLBACK_CONFIG_DIRS=/data/data/com.winlator/files/imagefs/usr/etc/xdg \
+    -DFALLBACK_DATA_DIRS=/data/data/com.winlator/files/imagefs/usr/local/share:/data/data/com.winlator/files/imagefs/usr/share \
+    -DSYSCONFDIR=/data/data/com.winlator/files/imagefs/usr/etc \
+    -DBUILD_WSI_XCB_SUPPORT=ON \
+    -DBUILD_WSI_XLIB_SUPPORT=ON \
+    -DBUILD_WSI_WAYLAND_SUPPORT=OFF
+
+# 编译并安装
+make -j$(nproc)
+make install
+cd ../..

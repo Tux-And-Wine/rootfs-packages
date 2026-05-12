@@ -1,0 +1,22 @@
+apt install dh-autoreconf
+
+# 1. 下载并解压
+wget https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.50.tar.bz2
+tar -xf libgpg-error-1.50.tar.bz2
+cd libgpg-error-1.50
+
+# 2. 重新生成构建系统（Termux 同款操作）
+autoreconf -vfi
+
+# 3. 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+# 4. 编译
+make -j$(nproc)
+
+# 5. 安装（避免宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

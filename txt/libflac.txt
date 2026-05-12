@@ -1,0 +1,20 @@
+# 下载并解压
+wget https://downloads.xiph.org/releases/flac/flac-1.5.0.tar.xz
+tar -xf flac-1.5.0.tar.xz
+cd flac-1.5.0
+
+# 设置 pkg-config 搜索路径（确保能找到 libogg）
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+# 编译 & 安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

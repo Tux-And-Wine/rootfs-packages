@@ -1,0 +1,16 @@
+# 下载
+wget https://xorg.freedesktop.org/releases/individual/lib/libXrender-0.9.12.tar.xz
+tar -xf libXrender-0.9.12.tar.xz
+cd libXrender-0.9.12
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+# 编译 & 安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

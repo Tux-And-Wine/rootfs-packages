@@ -1,0 +1,19 @@
+# 下载源码（内核镜像源，可靠）
+wget https://mirrors.kernel.org/gnu/gdbm/gdbm-1.24.tar.gz
+tar -xzf gdbm-1.24.tar.gz
+cd gdbm-1.24
+
+# 配置：打开 libgdbm-compat 并指定 readline 头文件/库路径（避免找不到）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --enable-libgdbm-compat \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib"
+
+# 编译
+make -j$(nproc)
+
+# 安装（避免宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

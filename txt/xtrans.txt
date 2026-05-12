@@ -1,0 +1,197 @@
+cd /opt
+wget https://xorg.freedesktop.org/releases/individual/lib/xtrans-1.5.2.tar.xz
+tar -xf xtrans-1.5.2.tar.xz
+cd xtrans-1.5.2
+
+cat > patch1-xtrans-root.patch << 'EOF'
+--- a/Xtransutil.c
++++ b/Xtransutil.c
+@@ -478,27 +478,6 @@
+ 	}
+ 	/* Dir doesn't exist. Try to create it */
+ 
+-#if !defined(WIN32) && !defined(__CYGWIN__)
+-	/*
+-	 * 'sticky' bit requested: assume application makes
+-	 * certain security implications. If effective user ID
+-	 * is != 0: fail as we may not be able to meet them.
+-	 */
+-	if (geteuid() != 0) {
+-	    if (mode & 01000) {
+-		prmsg(1, "mkdir: ERROR: euid != 0,"
+-		      "directory %s will not be created.\n",
+-		      path);
+-#ifdef FAIL_HARD
+-		return -1;
+-#endif
+-	    } else {
+-		prmsg(1, "mkdir: Cannot create %s with root ownership\n",
+-		      path);
+-	    }
+-	}
+-#endif
+-
+ #ifndef WIN32
+ 	if (mkdir(path, mode) == 0) {
+ 	    if (chmod(path, mode)) {
+@@ -521,14 +500,9 @@
+ 
+     } else {
+ 	if (S_ISDIR(buf.st_mode)) {
+-	    int updateOwner = 0;
+ 	    int updateMode = 0;
+-	    int updatedOwner = 0;
+ 	    int updatedMode = 0;
+ 	    int status = 0;
+-	    /* Check if the directory's ownership is OK. */
+-	    if (buf.st_uid != 0)
+-		updateOwner = 1;
+ 
+ 	    /*
+ 	     * Check if the directory's mode is OK.  An exact match isn't
+@@ -566,7 +540,7 @@
+ 	     * directory's owner and mode.  Otherwise it isn't safe to attempt
+ 	     * to do this.
+ 	     */
+-	    if (updateMode || updateOwner) {
++	    if (updateMode) {
+ 		int fd = -1;
+ 		struct stat fbuf;
+ 		if ((fd = open(path, O_RDONLY)) != -1) {
+@@ -588,8 +562,6 @@
+ 			close(fd);
+ 			return -1;
+ 		    }
+-		    if (updateOwner && fchown(fd, 0, 0) == 0)
+-			updatedOwner = 1;
+ 		    if (updateMode && fchmod(fd, mode) == 0)
+ 			updatedMode = 1;
+ 		    close(fd);
+@@ -597,20 +569,6 @@
+ 	    }
+ #endif
+ 
+-	    if (updateOwner && !updatedOwner) {
+-#ifdef FAIL_HARD
+-		if (status & FAIL_IF_NOT_ROOT) {
+-		    prmsg(1, "mkdir: ERROR: Owner of %s must be set to root\n",
+-			  path);
+-		    return -1;
+-		}
+-#endif
+-#if !defined(__APPLE_CC__) && !defined(__CYGWIN__)
+-		prmsg(1, "mkdir: Owner of %s should be set to root\n",
+-		      path);
+-#endif
+-	    }
+-
+ 	    if (updateMode && !updatedMode) {
+ #ifdef FAIL_HARD
+ 		if (status & FAIL_IF_NOMODE) {
+EOF
+
+
+
+
+
+
+
+
+
+
+
+
+cat > patch2-xtrans-pipe.patch << 'EOF'
+--- a/Xtranslcl.c
++++ b/Xtranslcl.c
+@@ -213,23 +213,23 @@
+ #ifndef X11_t
+ #define X_STREAMS_DIR	"/dev/X"
+ #else
+-#define X_STREAMS_DIR	"/tmp/.X11-pipe"
++#define X_STREAMS_DIR	"/data/data/com.winlator/files/imagefs/tmp/.X11-pipe"
+ #endif
+ 
+ #define DEV_PTMX	"/dev/ptmx"
+ 
+ #if defined(X11_t)
+ 
+-#define NAMEDNODENAME "/tmp/.X11-pipe/X"
++#define NAMEDNODENAME "/data/data/com.winlator/files/imagefs/tmp/.X11-pipe/X"
+ #endif
+ #if defined(XIM_t)
+-#define NAMEDNODENAME "/tmp/.XIM-pipe/XIM"
++#define NAMEDNODENAME "/data/data/com.winlator/files/imagefs/tmp/.XIM-pipe/XIM"
+ #endif
+ #if defined(FS_t) || defined (FONT_t)
+-#define NAMEDNODENAME	"/tmp/.font-pipe/fs"
++#define NAMEDNODENAME	"/data/data/com.winlator/files/imagefs/tmp/.font-pipe/fs"
+ #endif
+ #if defined(ICE_t)
+-#define NAMEDNODENAME	"/tmp/.ICE-pipe/"
++#define NAMEDNODENAME	"/data/data/com.winlator/files/imagefs/tmp/.ICE-pipe/"
+ #endif
+EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cat > patch3-xtrans-sock.patch << 'EOF'
+--- a/Xtranssock.c
++++ b/Xtranssock.c
+@@ -200,20 +200,20 @@
+ 
+ 
+ #if defined(X11_t)
+-#define UNIX_PATH "/tmp/.X11-unix/X"
+-#define UNIX_DIR "/tmp/.X11-unix"
++#define UNIX_PATH "/data/data/com.winlator/files/imagefs/tmp/.X11-unix/X"
++#define UNIX_DIR "/data/data/com.winlator/files/imagefs/tmp/.X11-unix"
+ #endif /* X11_t */
+ #if defined(XIM_t)
+-#define UNIX_PATH "/tmp/.XIM-unix/XIM"
+-#define UNIX_DIR "/tmp/.XIM-unix"
++#define UNIX_PATH "/data/data/com.winlator/files/imagefs/tmp/.XIM-unix/XIM"
++#define UNIX_DIR "/data/data/com.winlator/files/imagefs/tmp/.XIM-unix"
+ #endif /* XIM_t */
+ #if defined(FS_t) || defined(FONT_t)
+-#define UNIX_PATH "/tmp/.font-unix/fs"
+-#define UNIX_DIR "/tmp/.font-unix"
++#define UNIX_PATH "/data/data/com.winlator/files/imagefs/tmp/.font-unix/fs"
++#define UNIX_DIR "/data/data/com.winlator/files/imagefs/tmp/.font-unix"
+ #endif /* FS_t || FONT_t */
+ #if defined(ICE_t)
+-#define UNIX_PATH "/tmp/.ICE-unix/"
+-#define UNIX_DIR "/tmp/.ICE-unix"
++#define UNIX_PATH "/data/data/com.winlator/files/imagefs/tmp/.ICE-unix/"
++#define UNIX_DIR "/data/data/com.winlator/files/imagefs/tmp/.ICE-unix"
+ #endif /* ICE_t */
+EOF
+
+
+
+
+
+
+
+
+patch -p1 < patch1-xtrans-root.patch
+patch -p1 < patch2-xtrans-pipe.patch
+patch -p1 < patch3-xtrans-sock.patch
+
+./configure \
+    --prefix=/data/data/com.winlator/files/imagefs/usr
+
+make install
+cd ..

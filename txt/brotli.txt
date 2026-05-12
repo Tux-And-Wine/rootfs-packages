@@ -1,0 +1,23 @@
+wget https://github.com/google/brotli/archive/v1.1.0.tar.gz -O brotli-1.1.0.tar.gz
+tar -xzf brotli-1.1.0.tar.gz
+cd brotli-1.1.0
+
+mkdir build && cd build
+cmake .. \
+    -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+    -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+    -DCMAKE_AR=aarch64-linux-gnu-ar \
+    -DCMAKE_RANLIB=aarch64-linux-gnu-ranlib \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_SKIP_RPATH=ON
+make -j$(nproc)
+make install
+
+# 安装手册
+mkdir -p /data/data/com.winlator/files/imagefs/usr/share/man/man1
+mkdir -p /data/data/com.winlator/files/imagefs/usr/share/man/man3
+cp ../docs/brotli.1 /data/data/com.winlator/files/imagefs/usr/share/man/man1/
+cp ../docs/*.3 /data/data/com.winlator/files/imagefs/usr/share/man/man3/
+
+cd ../..

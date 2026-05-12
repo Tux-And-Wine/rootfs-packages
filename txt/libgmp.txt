@@ -1,0 +1,14 @@
+# 下载（使用国内镜像更快）
+wget https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz
+tar -xf gmp-6.3.0.tar.xz
+cd gmp-6.3.0
+
+# 配置（只编 C，禁用静态库）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"

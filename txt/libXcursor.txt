@@ -1,0 +1,38 @@
+wget https://xorg.freedesktop.org/releases/individual/lib/libXcursor-1.2.3.tar.xz
+tar -xf libXcursor-1.2.3.tar.xz
+cd libXcursor-1.2.3
+
+# 打补丁：修改光标主题搜索路径为安卓 rootfs 绝对路径
+cat > cursor-paths.patch << 'EOF'
+--- a/src/library.c
++++ b/src/library.c
+@@ -25,11 +25,11 @@
+ #include <string.h>
+ 
+ #ifndef ICONDIR
+-#define ICONDIR "/usr/X11R6/lib/X11/icons"
++#define ICONDIR "/data/data/com.winlator/files/imagefs/usr/X11R6/lib/X11/icons"
+ #endif
+ 
+ #ifndef XCURSORPATH
+-#define XCURSORPATH "~/.local/share/icons:~/.icons:/usr/share/icons:/usr/share/pixmaps:"ICONDIR
++#define XCURSORPATH "~/.local/share/icons:~/.icons:/data/data/com.winlator/files/imagefs/usr/share/icons:/data/data/com.winlator/files/imagefs/usr/share/pixmaps:"ICONDIR
+ #endif
+ 
+ const char *
+EOF
+
+patch -p1 < cursor-paths.patch
+
+# 配置（防范 malloc(0) 交叉检测）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译 & 安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

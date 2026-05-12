@@ -1,0 +1,16 @@
+# 下载
+wget https://github.com/nghttp2/nghttp2/releases/download/v1.65.0/nghttp2-1.65.0.tar.xz
+tar -xf nghttp2-1.65.0.tar.xz
+cd nghttp2-1.65.0
+
+# 配置（纯 C 库，只编译库本身）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --enable-lib-only \
+    --disable-static
+
+# 编译并安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"

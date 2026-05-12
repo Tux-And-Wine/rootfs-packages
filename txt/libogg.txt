@@ -1,0 +1,17 @@
+# 下载并解压（配方用的是 .tar.xz）
+wget https://github.com/xiph/ogg/releases/download/v1.3.5/libogg-1.3.5.tar.xz
+tar -xf libogg-1.3.5.tar.xz
+cd libogg-1.3.5
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译并安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

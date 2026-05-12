@@ -1,0 +1,43 @@
+wget https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2024.1.tar.xz
+tar -xf xorgproto-2024.1.tar.xz
+cd xorgproto-2024.1
+
+
+rm -f configure
+
+sed -i "s|get_option('datadir') + '/pkgconfig'|'/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig'|g" meson.build
+
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr
+
+meson install -C builddir
+
+
+
+rm -rf /data/data/com.winlator/files/imagefs/usr/include/X11/extensions/apple*
+rm -rf /data/data/com.winlator/files/imagefs/usr/include/X11/extensions/windows*
+rm -f /data/data/com.winlator/files/imagefs/usr/include/X11/extensions/XKBgeom.h
+rm -f /data/data/com.winlator/files/imagefs/usr/lib/pkgconfig/applewmproto.pc
+rm -f /data/data/com.winlator/files/imagefs/usr/lib/pkgconfig/windowswmproto.pc
+

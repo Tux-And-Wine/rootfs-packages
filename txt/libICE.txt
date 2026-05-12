@@ -1,0 +1,32 @@
+wget https://xorg.freedesktop.org/releases/individual/lib/libICE-1.1.2.tar.xz
+tar -xf libICE-1.1.2.tar.xz
+cd libICE-1.1.2
+
+# 打补丁：硬链接 → 符号链接（安卓内核限制）
+cat > ice-authutil.patch << 'EOF'
+--- a/src/authutil.c
++++ b/src/authutil.c
+@@ -188,7 +188,7 @@
+ 
+ 	if (creat_fd != -1)
+ 	{
+-	    if (link (creat_name, link_name) != -1)
++	    if (symlink (creat_name, link_name) != -1)
+ 		return (IceAuthLockSuccess);
+ 
+ 	    if (errno == ENOENT)
+EOF
+patch -p1 < ice-authutil.patch
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译与安装
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

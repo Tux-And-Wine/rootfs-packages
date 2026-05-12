@@ -1,0 +1,17 @@
+# 下载源码（注意是 .tar.xz）
+wget https://github.com/tukaani-project/xz/releases/download/v5.6.4/xz-5.6.4.tar.xz
+tar -xf xz-5.6.4.tar.xz
+cd xz-5.6.4
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --enable-sandbox=no
+
+# 编译
+make -j$(nproc)
+
+# 安装（避免宿主 strip 报错）
+make install INSTALL_PROGRAM="/usr/bin/install -c"

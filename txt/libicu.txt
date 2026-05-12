@@ -1,0 +1,81 @@
+# 下载
+wget https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.tgz
+
+# 解压到两个目录：一个用作交叉编译，一个用于宿主构建
+tar -xzf icu4c-76_1-src.tgz -C /opt/
+mv /opt/icu /opt/icu-src          # 交叉编译用
+
+tar -xzf icu4c-76_1-src.tgz -C /opt/
+mv /opt/icu /opt/icu-hostbuild    # 宿主构建用
+
+cd /opt/icu-src/source
+
+# 创建 ICU-22132.patch
+cat > /opt/ICU-22132.patch << 'END_PATCH'
+diff -u a/i18n/vtzone.cpp a/i18n/vtzone.cpp
+--- a/i18n/vtzone.cpp	2023-07-14 09:05:38.000000000 +0100
++++ b/i18n/vtzone.cpp	2023-07-14 09:05:38.000000000 +0100
+@@ -1735,14 +1735,14 @@
+             }
+         }
+     } else {
+-        UnicodeString icutzprop;
+-        UVector customProps(nullptr, uhash_compareUnicodeString, status);
++        UVector customProps(uprv_deleteUObject, uhash_compareUnicodeString, status);
+         if (olsonzid.length() > 0 && icutzver.length() > 0) {
+-            icutzprop.append(olsonzid);
+-            icutzprop.append(u'[');
+-            icutzprop.append(icutzver);
+-            icutzprop.append(u']');
+-            customProps.addElement(&icutzprop, status);
++            LocalPointer<UnicodeString> icutzprop(new UnicodeString(ICU_TZINFO_PROP), status);
++            icutzprop->append(olsonzid);
++            icutzprop->append(u'[');
++            icutzprop->append(icutzver);
++            icutzprop->append(u']');
++            customProps.adoptElement(icutzprop.orphan(), status);
+         }
+         writeZone(writer, *tz, &customProps, status);
+     }
+END_PATCH
+
+# 创建 icudata-stdlibs.patch
+cat > /opt/icudata-stdlibs.patch << 'END_PATCH'
+--- source/config/mh-linux	2013-09-14 18:53:23.284040467 -0400
++++ source/config/mh-linux	2013-09-14 18:53:23.284040467 -0400
+@@ -21,7 +21,9 @@
+ LD_RPATH_PRE = -Wl,-rpath,
+ 
+ ## These are the library specific LDFLAGS
+-LDFLAGSICUDT=-nodefaultlibs -nostdlib
++#LDFLAGSICUDT=-nodefaultlibs -nostdlib
++# Debian change: linking icudata as data only causes too many problems.
++LDFLAGSICUDT=
+ 
+ ## Compiler switch to embed a library name
+ # The initial tab in the next line is to prevent icu-config from reading it.
+END_PATCH
+
+给交叉编译源码打补丁
+cd /opt/icu-src/source
+patch -p1 < /opt/ICU-22132.patch
+patch -p1 < /opt/icudata-stdlibs.patch
+
+给宿主构建源码打补丁
+cd /opt/icu-hostbuild/source
+patch -p1 < /opt/ICU-22132.patch
+patch -p1 < /opt/icudata-stdlibs.patch
+
+cd /opt/icu-hostbuild/source
+./configure --prefix=/opt/icu-hostbuilt --disable-shared --enable-static
+make -j$(nproc)
+# 工具会在 bin/ 下生成，configure 会让交叉编译时自动找到
+
+cd /opt/icu-src/source
+./configure \
+    --host=aarch64-linux-gnu \
+    --with-cross-build=/opt/icu-hostbuild/source \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-renaming
+make -j$(nproc)
+make install

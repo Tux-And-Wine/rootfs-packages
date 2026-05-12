@@ -1,0 +1,51 @@
+# 1. 下载源码
+wget https://github.com/facebook/zstd/archive/v1.5.7.tar.gz -O zstd-1.5.7.tar.gz
+tar -xzf zstd-1.5.7.tar.gz
+cd zstd-1.5.7
+
+# 2. 打补丁（移除 gen_html 子目录）
+sed -i "/subdir('gen_html')/d" build/meson/contrib/meson.build
+
+#进入之前
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+# 3. 进入 Meson 构建目录
+cd build/meson
+
+# 4. 创建交叉编译描述文件
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+ranlib = 'aarch64-linux-gnu-ranlib'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+
+# 5. 配置
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --libdir=lib \
+    -Ddefault_library=both \
+    -Dbin_programs=true \
+    -Dbin_tests=false \
+    -Dbin_contrib=true \
+    -Dzlib=enabled \
+    -Dlzma=enabled \
+    -Dlz4=enabled
+
+# 6. 编译
+meson compile -C builddir
+
+# 7. 安装
+meson install -C builddir

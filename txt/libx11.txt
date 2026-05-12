@@ -1,0 +1,14 @@
+wget https://xorg.freedesktop.org/releases/individual/lib/libX11-1.8.11.tar.xz
+tar -xf libX11-1.8.11.tar.xz
+cd libX11-1.8.11
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --disable-xf86bigfont
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

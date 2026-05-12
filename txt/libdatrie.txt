@@ -1,0 +1,17 @@
+wget https://linux.thai.net/pub/thailinux/software/libthai/libdatrie-0.2.13.tar.xz
+tar -xf libdatrie-0.2.13.tar.xz
+cd libdatrie-0.2.13
+
+export CFLAGS="-O3 -pipe"
+export CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include"
+export LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib -liconv"
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

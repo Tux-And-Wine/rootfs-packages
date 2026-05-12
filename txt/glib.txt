@@ -1,0 +1,73 @@
+wget https://ftp.gnome.org/pub/gnome/sources/glib/2.82/glib-2.82.2.tar.xz
+tar -xf glib-2.82.2.tar.xz
+cd glib-2.82.2
+
+# 补丁1: gcharset.c - locale.alias 路径
+sed -i 's|"/usr/share/locale/locale.alias"|"/data/data/com.winlator/files/imagefs/usr/share/locale/locale.alias"|' glib/gcharset.c
+
+# 补丁2: gspawn-posix.c - PATH 和 /bin/sh 路径
+sed -i 's|"/bin:/usr/bin:."|"/data/data/com.winlator/files/imagefs/usr/bin:."|' glib/gspawn-posix.c
+sed -i 's|"/bin/sh"|"/data/data/com.winlator/files/imagefs/usr/bin/sh"|' glib/gspawn-posix.c
+
+# 补丁3: gutils.c - PATH, /tmp, os-release, XDG 数据目录
+sed -i 's|"/bin:/usr/bin:."|"/data/data/com.winlator/files/imagefs/usr/bin:."|' glib/gutils.c
+sed -i 's|"/tmp"|"/data/data/com.winlator/files/imagefs/tmp"|' glib/gutils.c
+sed -i 's|"/etc/os-release", "/usr/lib/os-release"|"/data/data/com.winlator/files/imagefs/usr/etc/os-release", "/data/data/com.winlator/files/imagefs/usr/lib/os-release"|' glib/gutils.c
+sed -i 's|"/usr/local/share/:/usr/share/"|"/data/data/com.winlator/files/imagefs/usr/local/share/:/data/data/com.winlator/files/imagefs/usr/share/"|' glib/gutils.c
+
+# 补丁4: gio/gdbusprivate.c - machine-id 路径
+sed -i 's|"/etc/machine-id"|"/data/data/com.winlator/files/imagefs/usr/etc/machine-id"|' gio/gdbusprivate.c
+
+# 补丁5: gio/gkeyfilesettingsbackend.c - settings 路径
+sed -i 's|"/etc/glib-2.0/settings"|"/data/data/com.winlator/files/imagefs/usr/etc/glib-2.0/settings"|' gio/gkeyfilesettingsbackend.c
+
+# 补丁6: gio/gnetworking.h.in - resolv.conf 路径
+sed -i 's|"/etc/resolv.conf"|"/data/data/com.winlator/files/imagefs/usr/etc/resolv.conf"|' gio/gnetworking.h.in
+
+# 补丁7: gio/xdgmime/xdgmime.c - XDG 数据目录
+sed -i 's|"/usr/local/share/:/usr/share/"|"/data/data/com.winlator/files/imagefs/usr/local/share/:/data/data/com.winlator/files/imagefs/usr/share/"|' gio/xdgmime/xdgmime.c
+
+
+
+# 移除 pidfd_open 检测代码块
+sed -i '/^# Check for pidfd_open/,/^endif$/d' meson.build
+
+
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+
+
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    -Ddefault_library=both \
+    -Druntime_dir=/data/data/com.winlator/files/imagefs/usr/var/run \
+    -Dglib_debug=disabled \
+    -Dselinux=disabled \
+    -Dlibmount=disabled \
+    -Dtests=false \
+    -Ddocumentation=false \
+    -Dman-pages=false \
+    -Dintrospection=disabled
+
+
+
+meson compile -C builddir
+meson install -C builddir

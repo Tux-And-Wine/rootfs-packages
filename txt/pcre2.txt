@@ -1,0 +1,25 @@
+# 1. 下载并解压（注意是 .tar.bz2）
+wget https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.bz2
+tar -xf pcre2-10.45.tar.bz2
+cd pcre2-10.45
+
+# 2. 配置（启用 16/32 位、JIT、readline/zlib/bz2 支持）
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-pcre2-16 \
+    --enable-pcre2-32 \
+    --enable-jit \
+    --enable-pcre2grep-libz \
+    --enable-pcre2grep-libbz2 \
+    --enable-pcre2test-libreadline \
+    --enable-malloc0returnsnull=no \
+    CPPFLAGS="-I/data/data/com.winlator/files/imagefs/usr/include" \
+    LDFLAGS="-L/data/data/com.winlator/files/imagefs/usr/lib"
+
+# 3. 编译 & 安装（防宿主 strip）
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

@@ -1,0 +1,51 @@
+# 下载并解压
+wget https://gitlab.freedesktop.org/cairo/cairo/-/archive/1.18.2/cairo-1.18.2.tar.bz2
+tar -xf cairo-1.18.2.tar.bz2
+cd cairo-1.18.2
+
+# 补丁1：cairo-script-operators.c 临时字体路径
+sed -i 's|char template\[\] = "/tmp/csi-font.XXXXXX";|char template[] = "/data/data/com.winlator/files/imagefs/tmp/csi-font.XXXXXX";|' util/cairo-script/cairo-script-operators.c
+
+# 补丁2：fdr.c 跟踪文件路径
+sed -i 's|ctx = DLCALL (cairo_script_create, "/tmp/fdr.trace");|ctx = DLCALL (cairo_script_create, "/data/data/com.winlator/files/imagefs/tmp/fdr.trace");|' util/cairo-fdr/fdr.c
+
+
+# 创建交叉编译文件
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+# 设置 pkg-config 路径，让它能搜到刚装好的 pixman, fontconfig 等
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    -Ddwrite=disabled \
+    -Dspectre=disabled \
+    -Dsymbol-lookup=disabled \
+    -Dtests=disabled \
+    -Dfontconfig=enabled \
+    -Dfreetype=enabled \
+    -Dglib=enabled \
+    -Dpng=enabled \
+    -Dxlib=enabled \
+    -Dxcb=enabled \
+    -Dtee=enabled \
+    -Ddefault_library=shared
+
+
+meson compile -C builddir
+meson install -C builddir

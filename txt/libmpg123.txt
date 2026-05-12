@@ -1,0 +1,17 @@
+# 下载并解压（注意是 .tar.bz2）
+wget https://mpg123.org/download/mpg123-1.32.10.tar.bz2
+tar -xf mpg123-1.32.10.tar.bz2
+cd mpg123-1.32.10
+
+# 配置
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+# 编译 & 安装（防宿主 strip）
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..
