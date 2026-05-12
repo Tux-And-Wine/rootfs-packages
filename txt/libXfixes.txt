@@ -1,0 +1,17 @@
+wget https://xorg.freedesktop.org/releases/individual/lib/libXfixes-6.0.1.tar.xz
+tar -xf libXfixes-6.0.1.tar.xz
+cd libXfixes-6.0.1
+
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..
