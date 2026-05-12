@@ -1,0 +1,17 @@
+git clone https://github.com/ptitSeb/box64.git
+cd box64
+mkdir build && cd build
+
+cmake .. \
+    -D CMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+    -D CMAKE_SYSROOT=/data/data/com.winlator/files/imagefs \
+    -D CMAKE_FIND_ROOT_PATH="/data/data/com.winlator/files/imagefs/usr" \
+    -D CMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    -D CMAKE_BUILD_TYPE=RelWithDebInfo \
+    -D ARM64=ON \
+    -D ARM_DYNAREC=ON \
+    -D BAD_SIGNAL=ON \
+    -D WINLATOR_GLIBC=ON
+
+make -j$(nproc)
+make install
