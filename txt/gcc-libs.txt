@@ -1,0 +1,52 @@
+cd /opt
+git clone https://github.com/moze30/winlator-wcp.git
+wget https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz
+tar -xf gcc-14.2.0.tar.xz 
+
+cd gcc-14.2.0
+PREFIX=/data/data/com.winlator/files/imagefs/usr
+PATCH_DIR=/opt/winlator-wcp/gcc-libs
+
+# 应用补丁
+sed -i "s|@TERMUX_PREFIX@|${PREFIX}|g" ${PATCH_DIR}/set_glibc_dynamic_linker.patch
+if ! patch -p1 < ${PATCH_DIR}/set_glibc_dynamic_linker.patch; then
+    echo "补丁失败，可能需要手动修改文件"
+    find gcc/config -name "*.h" -exec sed -i 's|/lib/ld-linux-aarch64|/data/data/com.winlator/files/imagefs/usr/lib/ld-linux-aarch64|g' {} \;
+fi
+
+# 其他补丁对 gcc-libs 不关键，可跳过
+
+sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
+echo "14.2.0" > gcc/BASE-VER
+echo "" > gcc/DEV-PHASE 
+
+mkdir build && cd build
+
+../configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --target=aarch64-linux-gnu \
+    --prefix=${PREFIX} \
+    --libdir=${PREFIX}/lib \
+    --libexecdir=${PREFIX}/lib \
+    --enable-languages=c,c++ \
+    --with-arch=armv8-a \
+    --disable-multilib \
+    --disable-bootstrap \
+    --disable-nls \
+    --disable-plugin \
+    --enable-default-pie \
+    --enable-default-ssp \
+    --enable-__cxa_atexit \
+    --disable-werror \
+    --disable-checking \
+    --disable-libssp \
+    --disable-libstdcxx-pch \
+    --with-linker-hash-style=gnu \
+    --with-system-zlib \
+    LD_FOR_TARGET=aarch64-linux-gnu-ld
+
+make -j$(nproc)
+make install
