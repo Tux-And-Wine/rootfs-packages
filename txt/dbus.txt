@@ -1,0 +1,53 @@
+cd /opt
+git clone https://github.com/termux-pacman/glibc-packages.git
+wget https://dbus.freedesktop.org/releases/dbus/dbus-1.15.6.tar.xz
+tar -xf dbus-1.15.6.tar.xz
+cd dbus-1.15.6
+
+# 打补丁：将临时目录路径指向 rootfs 的 /tmp
+PREFIX=/data/data/com.winlator/files/imagefs/usr
+TMPDIR=/data/data/com.winlator/files/imagefs/tmp
+
+cat > dbus-sysdeps-unix.patch << 'EOF'
+--- a/dbus/dbus-sysdeps-unix.c
++++ b/dbus/dbus-sysdeps-unix.c
+@@ -3602,7 +3602,7 @@
+ 
+       /* And this is the sane fallback. */
+       if (tmpdir == NULL)
+-        tmpdir = "/tmp";
++        tmpdir = "/data/data/com.winlator/files/imagefs/tmp";
+     }
+ 
+   _DBUS_UNLOCK (sysdeps);
+EOF
+patch -p1 < dbus-sysdeps-unix.patch
+
+# 设置 pkg-config 搜索路径
+export PKG_CONFIG_LIBDIR=${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=${PREFIX} \
+    --libdir=${PREFIX}/lib \
+    --libexecdir=${PREFIX}/lib \
+    --sysconfdir=${PREFIX}/etc \
+    --localstatedir=${PREFIX}/var \
+    --runstatedir=${PREFIX}/var/run \
+    --disable-libaudit \
+    --disable-systemd \
+    --disable-tests \
+    --disable-xml-docs \
+    --enable-inotify \
+    --enable-x11-autolaunch \
+    --with-test-socket-dir=${TMPDIR} \
+    --with-session-socket-dir=${TMPDIR} \
+    --with-x=auto \
+    --without-systemdsystemunitdir \
+    --disable-selinux
+
+make -j$(nproc)
+make install DESTDIR=/data/data/com.winlator/files/imagefs
+cd ..

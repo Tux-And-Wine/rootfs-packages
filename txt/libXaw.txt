@@ -1,0 +1,24 @@
+cd /opt
+git clone https://github.com/termux-pacman/glibc-packages.git
+wget https://xorg.freedesktop.org/releases/individual/lib/libXaw-1.0.16.tar.xz
+tar -xf libXaw-1.0.16.tar.xz
+cd libXaw-1.0.16
+
+# 打补丁：替换默认路径为 rootfs 内部路径
+PREFIX=/data/data/com.winlator/files/imagefs/usr
+sed -i "s|@TERMUX_PREFIX@|${PREFIX}|g" /opt/glibc-packages/gpkg/libxaw/src-pixmap.c.patch 2>/dev/null
+patch -p1 < /opt/glibc-packages/gpkg/libxaw/src-pixmap.c.patch
+
+export PKG_CONFIG_LIBDIR=${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=${PREFIX} \
+    --disable-static \
+    --enable-malloc0returnsnull=no
+
+make -j$(nproc)
+make install INSTALL_PROGRAM="/usr/bin/install -c"
+cd ..

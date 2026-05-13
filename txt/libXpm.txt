@@ -1,17 +1,20 @@
 cd /opt
-wget https://xorg.freedesktop.org/releases/individual/lib/libSM-1.2.5.tar.xz
-tar -xf libSM-1.2.5.tar.xz
-cd libSM-1.2.5
+wget https://xorg.freedesktop.org/releases/individual/lib/libXpm-3.5.17.tar.xz
+tar -xf libXpm-3.5.17.tar.xz
+cd libXpm-3.5.17
 
-# 设置 pkg-config 搜索路径（确保能找到 libuuid、libice 等）
 export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
 export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
 ./configure \
     --host=aarch64-linux-gnu \
     --build=x86_64-linux-gnu \
     --prefix=/data/data/com.winlator/files/imagefs/usr \
     --disable-static \
-    --enable-malloc0returnsnull=no
+    --disable-open-zfile \
+    ac_cv_path_XPM_PATH_COMPRESS=/data/data/com.winlator/files/imagefs/usr/bin/compress \
+    ac_cv_path_XPM_PATH_UNCOMPRESS=/data/data/com.winlator/files/imagefs/usr/bin/uncompress \
+    ac_cv_path_XPM_PATH_GZIP=/data/data/com.winlator/files/imagefs/usr/bin/gzip
 
 make -j$(nproc)
 make install INSTALL_PROGRAM="/usr/bin/install -c"

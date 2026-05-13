@@ -1,11 +1,10 @@
-cd /opt
-wget https://xorg.freedesktop.org/releases/individual/lib/libSM-1.2.5.tar.xz
-tar -xf libSM-1.2.5.tar.xz
-cd libSM-1.2.5
+wget https://xorg.freedesktop.org/releases/individual/lib/libXt-1.3.1.tar.xz
+tar -xf libXt-1.3.1.tar.xz
+cd libXt-1.3.1
 
-# 设置 pkg-config 搜索路径（确保能找到 libuuid、libice 等）
 export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
 export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
 ./configure \
     --host=aarch64-linux-gnu \
     --build=x86_64-linux-gnu \

@@ -1,0 +1,18 @@
+cd /opt
+wget https://github.com/libunwind/libunwind/releases/download/v1.8.1/libunwind-1.8.1.tar.gz
+tar -xzf libunwind-1.8.1.tar.gz
+cd libunwind-1.8.1
+
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+./configure \
+    --host=aarch64-linux-gnu \
+    --build=x86_64-linux-gnu \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    --disable-tests \
+    --enable-shared
+
+make -j$(nproc)
+make install
+cd ..

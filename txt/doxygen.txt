@@ -1,0 +1,35 @@
+cd /opt
+wget https://github.com/doxygen/doxygen/archive/Release_1_13_2.tar.gz -O doxygen-1.13.2.tar.gz
+tar -xzf doxygen-1.13.2.tar.gz
+cd doxygen-Release_1_13_2
+
+# 创建 CMake 工具链文件
+cat > toolchain-aarch64.cmake << 'EOF'
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+set(CMAKE_SYSROOT /data/data/com.winlator/files/imagefs)
+set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+set(CMAKE_FIND_ROOT_PATH /data/data/com.winlator/files/imagefs/usr)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+EOF
+
+# 配置（注意 PYTHON_EXECUTABLE 指向宿主机 python3，因为需要运行 python 脚本）
+cmake -B build \
+    -DCMAKE_TOOLCHAIN_FILE=toolchain-aarch64.cmake \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.winlator/files/imagefs/usr \
+    -DDOC_INSTALL_DIR:PATH=share/doc/doxygen \
+    -DPYTHON_EXECUTABLE:FILE=$(command -v python3) \
+    -DCMAKE_BUILD_TYPE=Release
+
+# 编译并安装
+cmake --build build --parallel $(nproc)
+cmake --install build
+
+# 安装 man 手册（按配方）
+mkdir -p /data/data/com.winlator/files/imagefs/usr/share/man/man1
+cp doc/doxygen.1 /data/data/com.winlator/files/imagefs/usr/share/man/man1/
+
+cd ..
