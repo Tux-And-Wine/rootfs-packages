@@ -49,5 +49,5 @@ export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
     --disable-selinux
 
 make -j$(nproc)
-make install DESTDIR=/data/data/com.winlator/files/imagefs
+make install 
 cd ..

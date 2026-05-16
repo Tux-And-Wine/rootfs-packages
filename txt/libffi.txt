@@ -1,5 +1,8 @@
 wget https://github.com/libffi/libffi/releases/download/v3.4.7/libffi-3.4.7.tar.gz
 
+tar xvf libffi-3.4.7.tar.gz
+cd libffi-3.4.7
+
 ./configure \
 --prefix=/data/data/com.winlator/files/imagefs/usr \
 --host=aarch64-linux-gnu \
@@ -9,3 +12,4 @@ wget https://github.com/libffi/libffi/releases/download/v3.4.7/libffi-3.4.7.tar.
 --enable-pax_emutramp
 
 make -j$(nproc)
+make install

@@ -23,7 +23,7 @@ cd ncurses-6.5
 --mandir=/data/data/com.winlator/files/imagefs/usr/share/man
 
 make -j$(nproc)
-make install DESTDIR=/data/data/com.winlator/files/imagefs
+make install 
 
 
 sed -i 's/^INSTALL_PROG\s*=.*/INSTALL_PROG = \$(INSTALL)/' progs/Makefile

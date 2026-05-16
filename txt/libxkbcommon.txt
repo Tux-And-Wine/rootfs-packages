@@ -1,0 +1,33 @@
+wget https://github.com/xkbcommon/libxkbcommon/archive/xkbcommon-1.8.0.tar.gz -O libxkbcommon-1.8.0.tar.gz
+tar -xzf libxkbcommon-1.8.0.tar.gz
+cd libxkbcommon-xkbcommon-1.8.0
+
+# 交叉文件
+cat > cross-aarch64.txt << 'EOF'
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+cpp = 'aarch64-linux-gnu-g++'
+ar = 'aarch64-linux-gnu-ar'
+strip = 'aarch64-linux-gnu-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+
+meson setup builddir \
+    --cross-file cross-aarch64.txt \
+    --prefix=/data/data/com.winlator/files/imagefs/usr \
+    -Denable-wayland=false \
+    -Denable-x11=true \
+    -Denable-docs=false
+
+meson compile -C builddir
+meson install -C builddir
+cd ..

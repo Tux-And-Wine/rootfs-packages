@@ -1,19 +1,26 @@
+# ===== 下载并解压 HarfBuzz 10.1.0 源码 =====
 cd /opt
 rm -rf harfbuzz-10.1.0
 wget https://github.com/harfbuzz/harfbuzz/archive/10.1.0.tar.gz -O harfbuzz-10.1.0.tar.gz
 tar -xzf harfbuzz-10.1.0.tar.gz
 cd harfbuzz-10.1.0
 
+# ===== 修复1：C++ 标准从 c++11 升级到 c++17 (GCC 14 强制要求) =====
 sed -i "s/'cpp_std=c++11'/'cpp_std=c++17'/" meson.build
 sed -i "s/get_option('cpp_std') == 'c++11'/get_option('cpp_std') == 'c++17'/g" meson.build
-sed -i '395,397s/^/\/\//' /data/data/com.winlator/files/imagefs/usr/include/inttypes.h
+
+# ===== 修复3：删除 util/ 头文件中重复的 assert.h（避免冗余声明错误）=====
 sed -i '/^#include <assert.h>$/d' util/ansi-print.hh
 sed -i '/^#include <assert.h>$/d' util/options.hh
 
-unset CFLAGS CXXFLAGS
-export CFLAGS="-O2 -pipe"
-export CXXFLAGS="-O2 -pipe"
+# ===== 修复2：注释 sysroot inttypes.h 中四个重复的 __REDIRECT_NTH 声明 =====
+# （避免 strtoimax/strtoumax/wcstoimax/wcstoumax 的重定向声明与普通声明冲突）
+sed -i '384,386s/^/\/\//' /data/data/com.winlator/files/imagefs/usr/include/inttypes.h
+sed -i '387,389s/^/\/\//' /data/data/com.winlator/files/imagefs/usr/include/inttypes.h
+sed -i '390,393s/^/\/\//' /data/data/com.winlator/files/imagefs/usr/include/inttypes.h
+sed -i '394,397s/^/\/\//' /data/data/com.winlator/files/imagefs/usr/include/inttypes.h
 
+# ===== 创建 Meson 交叉编译文件 =====
 cat > cross-aarch64.txt << 'EOF'
 [binaries]
 c = 'aarch64-linux-gnu-gcc'
@@ -33,9 +40,11 @@ cpu = 'aarch64'
 endian = 'little'
 EOF
 
-export PKG_CONFIG_LIBDIR=/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig
-export PKG_CONFIG_SYSROOT_DIR=/data/data/com.winlator/files/imagefs
+# ===== 设置 pkg-config 搜索路径 (指向 Winlator 的 sysroot) =====
+export PKG_CONFIG_LIBDIR="/data/data/com.winlator/files/imagefs/usr/lib/pkgconfig:/data/data/com.winlator/files/imagefs/usr/share/pkgconfig"
+export PKG_CONFIG_SYSROOT_DIR="/data/data/com.winlator/files/imagefs"
 
+# ===== 配置 Meson (启用 glib/gobject/cairo/freetype，禁用 docs/icu/graphite2/introspection) =====
 meson setup builddir \
   --cross-file cross-aarch64.txt \
   --prefix=/data/data/com.winlator/files/imagefs/usr \
@@ -48,9 +57,10 @@ meson setup builddir \
   -Dicu=disabled \
   -Dintrospection=disabled
 
+# ===== 编译与安装 =====
 meson compile -C builddir
 meson install -C builddir
 
-ls /data/data/com.winlator/files/imagefs/usr/lib/libharfbuzz.so*
-ls /data/data/com.winlator/files/imagefs/usr/lib/libharfbuzz-cairo.so*
+# ===== 验证安装的库 =====
+ls /data/data/com.winlator/files/imagefs/usr/lib/libharfbuzz*
 cd ..

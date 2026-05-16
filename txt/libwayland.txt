@@ -69,7 +69,7 @@ EOF
 patch -p1 < setdirs.patch
 
 # 3. 确保宿主机有 wayland-scanner
-apt update && apt install -y wayland-scanner
+apt update 
 
 # 4. 创建交叉编译文件和原生文件
 cat > cross-aarch64.txt << 'EOF'

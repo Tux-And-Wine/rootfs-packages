@@ -1,0 +1,99 @@
+--- linux-api-headers
+下载好并解压头文件
+make headers_install ARCH=arm64 INSTALL_HDR_PATH=/data/data/com.winlator/files/imagefs/usr
+--- gcc-libs
+--- glibc
+--- zlib
+--- libffi
+--- ncurses
+--- readline
+--- openssl
+--- libbz2
+--- liblzma
+--- liblz4
+--- zstd
+--- gdbm
+--- libgpg-error
+--- libgcrypt
+--- libgmp
+--- libmpfr
+--- libmpc
+--- libiconv
+--- libunistring
+--- libidn2
+--- libxml2
+--- libxslt
+--- libnghttp2
+--- brotli
+--- libpsl
+--- libssh2
+--- libcurl
+--- xorgproto
+--- libXau
+--- libXdmcp
+--- xcb-proto
+--- libxcb
+--- xtrans
+--- libX11
+--- libXext
+--- libXrender 
+--- libXfixes
+--- libXi
+--- libXrandr
+--- libXcursor
+--- libXinerama
+--- libXcomposite
+--- libpciaccess
+--- libdrm
+--- vulkan-headers
+--- vulkan-icd-loader
+--- SPIRV-Headers
+--- SPIRV-Tools
+--- freetype
+--- libexpat
+--- fontconfig
+--- pcre2
+--- glib
+--- libpixman
+--- libcairo
+--- fribidi
+--- harfbuzz
+--- libdatrie
+--- libXft
+--- libthai
+--- pango 利用主机依赖编译
+--- libXxf86vm
+--- libxshmfence
+--- libjpeg-turbo
+--- giflib
+--- jbigkit
+--- libtiff 
+--- libogg
+--- libvorbis
+--- libflac
+--- libopus
+--- libmp3lame 
+--- libmpg123
+--- libsndfile
+--- alsa-lib 
+--- libglvnd
+--- libepoxy
+--- libwayland 利用主机依赖
+--- xkeyboard-config
+--- libxkbcommon
+--- libICE
+--- util-linux
+--- libSM
+--- libXt
+--- libXmu
+--- libXpm
+--- libXaw
+--- dbus
+--- doxygen
+--- libpulse 
+--- libunwind
+
+
+
+
+
