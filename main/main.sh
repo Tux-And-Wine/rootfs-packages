@@ -134,6 +134,7 @@ build_pkg() {
     # 直接安装到目标 rootfs (PREFIX)
     if declare -F install_target &>/dev/null; then
         info "安装到目标 rootfs: ${PREFIX}"
+        unset DESTDIR 
         install_target
     else
         warn "配方未定义 install_target()，跳过直接安装到 ${PREFIX}"

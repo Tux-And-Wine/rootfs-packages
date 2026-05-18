@@ -1,0 +1,11 @@
+--- a/src/authutil.c
++++ b/src/authutil.c
+@@ -188,7 +188,7 @@
+ 
+ 	if (creat_fd != -1)
+ 	{
+-	    if (link (creat_name, link_name) != -1)
++	    if (symlink (creat_name, link_name) != -1)
+ 		return (IceAuthLockSuccess);
+ 
+ 	    if (errno == ENOENT)

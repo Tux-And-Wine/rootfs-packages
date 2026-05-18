@@ -1,0 +1,11 @@
+--- a/dbus/dbus-sysdeps-unix.c
++++ b/dbus/dbus-sysdeps-unix.c
+@@ -3602,7 +3602,7 @@
+ 
+       /* And this is the sane fallback. */
+       if (tmpdir == NULL)
+-        tmpdir = "/tmp";
++        tmpdir = "@@IMAGEFS_ROOT@@/tmp";
+     }
+ 
+   _DBUS_UNLOCK (sysdeps);

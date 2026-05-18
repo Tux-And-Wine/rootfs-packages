@@ -1,0 +1,41 @@
+# packages/fribidi/recipe.sh
+# libfribidi - Unicode 双向文本处理库
+
+PKGNAME="fribidi"
+VERSION="1.0.16"
+SRC_URI="https://github.com/fribidi/fribidi/releases/download/v${VERSION}/fribidi-${VERSION}.tar.xz"
+SRC_DIR="fribidi-${VERSION}"
+
+build() {
+    cat > cross-aarch64.txt <<-EOF
+    [binaries]
+    c = '${TARGET_HOST}-gcc'
+    cpp = '${TARGET_HOST}-g++'
+    ar = '${TARGET_HOST}-ar'
+    strip = '${TARGET_HOST}-strip'
+    pkgconfig = 'pkg-config'
+
+    [host_machine]
+    system = 'linux'
+    cpu_family = 'aarch64'
+    cpu = 'aarch64'
+    endian = 'little'
+	EOF
+
+    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
+    export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
+
+    meson setup builddir \
+        --cross-file cross-aarch64.txt \
+        --prefix="${PREFIX}"
+
+    meson compile -C builddir
+}
+
+install() {
+    meson install --destdir "$DESTDIR" -C builddir
+}
+
+install_target() {
+    meson install -C builddir
+}

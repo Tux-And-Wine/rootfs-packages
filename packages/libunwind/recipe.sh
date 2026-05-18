@@ -1,0 +1,28 @@
+# packages/libunwind/recipe.sh
+# libunwind - 可移植堆栈展开库
+
+PKGNAME="libunwind"
+VERSION="1.8.1"
+SRC_URI="https://github.com/libunwind/libunwind/releases/download/v${VERSION}/libunwind-${VERSION}.tar.gz"
+SRC_DIR="libunwind-${VERSION}"
+
+build() {
+    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig"
+    export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
+
+    ./configure \
+        --host="${TARGET_HOST}" \
+        --build="${BUILD_HOST}" \
+        --prefix="${PREFIX}" \
+        --disable-tests \
+        --enable-shared
+    make -j$(nproc)
+}
+
+install() {
+    make install DESTDIR="$DESTDIR"
+}
+
+install_target() {
+    make install
+}
