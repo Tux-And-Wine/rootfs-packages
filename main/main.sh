@@ -5,14 +5,13 @@ set -euo pipefail
 #  main.sh  —— 包构建系统的流程编排入口
 #  参数：
 #    -r <pkg...>     清理指定包的 output 和 work 目录后强制重建
+#    all              按 packages/all/recipe.sh 定义的顺序依次构建全部包
 #    <pkg...>         要构建的包名，不指定则构建全部
 # ============================================================
 
-# ----- 0. 确定根目录 -----
 MAIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$MAIN_DIR")"
 
-# ----- 1. 加载公共函数库 -----
 for lib in common fetch unpack rebuild; do
     if [[ -f "${PROJECT_ROOT}/lib/${lib}.sh" ]]; then
         source "${PROJECT_ROOT}/lib/${lib}.sh"
@@ -22,23 +21,19 @@ for lib in common fetch unpack rebuild; do
     fi
 done
 
-# ----- 2. 加载可选全局配置 -----
 if [[ -f "${PROJECT_ROOT}/config.sh" ]]; then
     source "${PROJECT_ROOT}/config.sh"
 fi
 
-# ----- 3. 路径常量 -----
 PACKAGES_DIR="${PROJECT_ROOT}/packages"
 DOWNLOAD_DIR="${PROJECT_ROOT}/downloads"
 WORK_DIR="${PROJECT_ROOT}/work"
 OUTPUT_DIR="${PROJECT_ROOT}/output"
 
-# ----- 4. 内部状态 -----
 declare -A PKG_RECIPE_DIR
 declare -A BUILT_PKGS
 REBUILD=false
 
-# ----- 5. 扫描所有配方 -----
 scan_recipes() {
     PKG_RECIPE_DIR=()
     for recipe in "$PACKAGES_DIR"/*/recipe.sh; do
@@ -49,16 +44,13 @@ scan_recipes() {
     done
 }
 
-# ----- 6. 构建单个包（流程模板） -----
 build_pkg() {
     local pkg_name="$1"
 
-    # 重建模式下，先清理旧产物和工作目录
     if $REBUILD; then
         clean_pkg "$pkg_name"
     fi
 
-    # 已构建则跳过（非重建模式）
     if ! $REBUILD && [[ -n "${BUILT_PKGS[$pkg_name]:-}" ]]; then
         return 0
     fi
@@ -84,7 +76,6 @@ build_pkg() {
     local src_dir="$pkg_work/src/$src_dir_name"
     local dest_dir="$pkg_work/destdir"
 
-    # 非重建模式且 output 已存在，跳过
     if ! $REBUILD && [[ -d "$OUTPUT_DIR/$PKGNAME" ]]; then
         info "$PKGNAME 已构建完成，跳过 (如需重编请使用 -r <包名>)"
         BUILT_PKGS["$pkg_name"]=1
@@ -96,34 +87,28 @@ build_pkg() {
     $REBUILD && info "（强制重建模式）"
     info "========================================="
 
-    # 下载
     local dl_path="$DOWNLOAD_DIR/$src_basename"
     download "$SRC_URI" "$dl_path"
 
-    # 解压
     rm -rf "$pkg_work/src"
     extract "$dl_path" "$pkg_work/src"
     [[ -d "$src_dir" ]] || error "源码目录不存在: $src_dir"
     cd "$src_dir"
 
-    # 可选钩子: prepare()
     if declare -F prepare &>/dev/null; then
         info "执行 prepare()"
         prepare
     fi
 
-    # 构建
     info "执行 build()"
     build
 
-    # 安装到 DESTDIR（用于收集到 output）
     rm -rf "$dest_dir"
     mkdir -p "$dest_dir"
     export DESTDIR="$dest_dir"
     info "执行 install() [DESTDIR=$dest_dir]"
     install
 
-    # 收集产物到 output/
     mkdir -p "$OUTPUT_DIR/$PKGNAME"
     if compgen -G "$dest_dir/*" > /dev/null; then
         cp -a "$dest_dir"/* "$OUTPUT_DIR/$PKGNAME/"
@@ -131,10 +116,9 @@ build_pkg() {
         warn "$PKGNAME: install() 没有输出任何文件"
     fi
 
-    # 直接安装到目标 rootfs (PREFIX)
     if declare -F install_target &>/dev/null; then
         info "安装到目标 rootfs: ${PREFIX}"
-        unset DESTDIR 
+        unset DESTDIR
         install_target
     else
         warn "配方未定义 install_target()，跳过直接安装到 ${PREFIX}"
@@ -144,47 +128,37 @@ build_pkg() {
     BUILT_PKGS["$pkg_name"]=1
 }
 
-# ----- 7. 主入口 -----
 main() {
     local packages_to_build=()
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            -r)
-                REBUILD=true
-                shift
-                # 必须提供至少一个包名
-                if [[ $# -eq 0 ]]; then
-                    error "-r 参数后必须指定包名"
-                fi
-                ;;
-            *)
-                packages_to_build+=("$1")
-                shift
-                ;;
+            -r) REBUILD=true; shift ;;
+            *)  packages_to_build+=("$1"); shift ;;
         esac
     done
+
+    # 如果指定了 all，从 all 配方中读取构建顺序
+    if [[ " ${packages_to_build[*]} " == *" all "* ]]; then
+        local all_recipe="${PACKAGES_DIR}/all/recipe.sh"
+        if [[ -f "$all_recipe" ]]; then
+            source "$all_recipe"
+            packages_to_build=("${ALL_BUILD_ORDER[@]}")
+        else
+            error "找不到 all 配方: $all_recipe"
+        fi
+    fi
+
+    # 必须明确给出包名或 all
+    if [[ ${#packages_to_build[@]} -eq 0 ]]; then
+        error "用法: $0 [-r] <包名...> 或 $0 [-r] all"
+    fi
 
     mkdir -p "$DOWNLOAD_DIR" "$WORK_DIR" "$OUTPUT_DIR"
     scan_recipes
 
-    if [[ ${#PKG_RECIPE_DIR[@]} -eq 0 ]]; then
-        warn "packages/ 下没有找到任何配方"
-        exit 0
-    fi
-
-    if [[ ${#packages_to_build[@]} -eq 0 ]]; then
-        # 构建全部（此时 REBUILD 必定为 false，因为 -r 必须带包名）
-        info "将构建全部包: ${!PKG_RECIPE_DIR[*]}"
-        local sorted_pkgs=$(printf '%s\n' "${!PKG_RECIPE_DIR[@]}" | sort)
-        for pkg in $sorted_pkgs; do
-            build_pkg "$pkg"
-        done
-    else
-        # 构建指定包
-        for pkg in "${packages_to_build[@]}"; do
-            build_pkg "$pkg"
-        done
-    fi
+    for pkg in "${packages_to_build[@]}"; do
+        build_pkg "$pkg"
+    done
 
     info "所有任务完成。"
 }

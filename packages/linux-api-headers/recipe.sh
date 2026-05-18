@@ -7,8 +7,12 @@ SRC_URI="https://www.kernel.org/pub/linux/kernel/v${VERSION%%.*}.x/linux-${VERSI
 SRC_DIR="linux-${VERSION}"
 
 build() {
-    # 纯头文件，无需编译
-    true
+    # 清理源码树（必须，否则 headers_install 可能失败）
+    make mrproper
+}
+
+install() {
+    make headers_install ARCH=arm64 INSTALL_HDR_PATH="${DESTDIR}${PREFIX}"
 }
 
 install_target() {
