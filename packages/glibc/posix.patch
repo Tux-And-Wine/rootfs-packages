@@ -1,0 +1,24 @@
+diff -Naur glibc-2.42-old/include/shm-directory.h glibc-2.42/include/shm-directory.h
+--- glibc-2.42-old/include/shm-directory.h	2026-05-18 10:43:01.527839972 +0000
++++ glibc-2.42/include/shm-directory.h	2026-05-18 10:46:00.692361764 +0000
+@@ -23,7 +23,7 @@
+ #include <stdbool.h>
+ 
+ /* The directory that contains shared POSIX objects.  */
+-#define SHMDIR _PATH_DEV "shm/"
++#define SHMDIR "@@IMAGEFS_ROOT@@/tmp/"
+ 
+ struct shmdir_name
+ {
+diff -Naur glibc-2.42-old/sysvipc/Makefile glibc-2.42/sysvipc/Makefile
+--- glibc-2.42-old/sysvipc/Makefile	2026-05-18 10:43:03.379905942 +0000
++++ glibc-2.42/sysvipc/Makefile	2026-05-18 10:45:29.138585911 +0000
+@@ -29,7 +29,7 @@
+ 	    msgsnd msgrcv msgget msgctl \
+ 	    semop semget semctl semtimedop \
+ 	    shmem-android \
+-	    shmat shmdt shmget shmctl
++	    shmat shmdt shmget shmctl android_sysvshm
+ 
+ tests    := test-sysvmsg test-sysvsem test-sysvshm
+ 
