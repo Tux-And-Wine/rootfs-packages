@@ -3,10 +3,10 @@ set -euo pipefail
 
 # ============================================================
 #  main.sh  —— 包构建系统的流程编排入口
-#  参数：
-#    -r <pkg...>     清理指定包的 output 和 work 目录后强制重建
-#    all              按 packages/all/recipe.sh 定义的顺序依次构建全部包
-#    <pkg...>         要构建的包名，不指定则构建全部
+#  用法：
+#    ./start-build.sh <pkg...>         构建指定包
+#    ./start-build.sh -r <pkg...>      清理后重建指定包
+#    ./start-build.sh all              按顺序构建全部包
 # ============================================================
 
 MAIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -62,6 +62,9 @@ build_pkg() {
 
     local recipe_file="${recipe_dir}/recipe.sh"
     [[ -f "$recipe_file" ]] || error "配方文件不存在: $recipe_file"
+
+    # ----- 清除上一个包可能残留的函数 -----
+    unset -f prepare build install install_target 2>/dev/null || true
 
     source "$recipe_file"
 
@@ -137,7 +140,6 @@ main() {
         esac
     done
 
-    # 如果指定了 all，从 all 配方中读取构建顺序
     if [[ " ${packages_to_build[*]} " == *" all "* ]]; then
         local all_recipe="${PACKAGES_DIR}/all/recipe.sh"
         if [[ -f "$all_recipe" ]]; then
@@ -148,7 +150,6 @@ main() {
         fi
     fi
 
-    # 必须明确给出包名或 all
     if [[ ${#packages_to_build[@]} -eq 0 ]]; then
         error "用法: $0 [-r] <包名...> 或 $0 [-r] all"
     fi

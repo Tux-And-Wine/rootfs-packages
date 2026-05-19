@@ -11,7 +11,7 @@ ALL_BUILD_ORDER=(
     ncurses
     readline
     openssl
-    libbz2
+    bzip2
     liblzma
     liblz4
     zstd
