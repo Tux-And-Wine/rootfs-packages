@@ -7,16 +7,19 @@ download() {
 
     mkdir -p "$(dirname "$output")"
 
-    if [[ -f "$output" ]]; then
+    if [[ -s "$output" ]]; then
         info "已缓存: $output"
         return 0
     fi
 
+    # Remove empty/corrupted file from previous failed download
+    [[ -f "$output" ]] && rm -f "$output"
+
     info "下载: $url"
     if command -v wget &>/dev/null; then
-        wget -q --show-progress -O "$output" "$url"
+        wget -q --show-progress -O "$output" "$url" || { rm -f "$output"; error "下载失败: $url"; }
     elif command -v curl &>/dev/null; then
-        curl -L --progress-bar -o "$output" "$url"
+        curl -L --progress-bar -o "$output" "$url" || { rm -f "$output"; error "下载失败: $url"; }
     else
         error "需要 wget 或 curl 下载源码"
     fi

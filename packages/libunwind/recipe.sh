@@ -7,7 +7,7 @@ SRC_URI="https://github.com/libunwind/libunwind/releases/download/v${VERSION}/li
 SRC_DIR="libunwind-${VERSION}"
 
 build() {
-    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig"
+    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
     export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
 
     ./configure \

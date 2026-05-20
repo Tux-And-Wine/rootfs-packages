@@ -9,6 +9,9 @@ SRC_DIR="pulseaudio-${VERSION}"
 prepare() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
 
+    # 创建 .tarball-version 文件，否则 git-version-gen 无法获取版本号
+    echo "${VERSION}" > .tarball-version
+
     # 应用路径补丁（自动替换 @@PREFIX@@ 和 @@IMAGEFS_ROOT@@）
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed -e "s|@@PREFIX@@|${PREFIX}|g" \

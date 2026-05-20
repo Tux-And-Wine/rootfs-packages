@@ -10,7 +10,7 @@ export PREFIX="/data/data/com.winlator/files/imagefs/usr"
 
 # pkg-config 路径（交叉编译时使用）
 export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
-export PKG_CONFIG_SYSROOT_DIR="/data/data/com.winlator/files/imagefs"
+export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
 
 # 传递给 make install 的额外参数
 export MAKE_INSTALL_PROGRAM='INSTALL_PROGRAM="/usr/bin/install -c"'

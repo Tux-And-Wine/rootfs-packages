@@ -28,8 +28,12 @@ build() {
     meson setup builddir \
         --cross-file cross-aarch64.txt \
         --prefix="${PREFIX}" \
+        -Dc_link_args="-Wl,--allow-shlib-undefined" \
         -Dintrospection=disabled \
         -Dgtk_doc=false
+
+    # glibc 2.42: __REDIRECT 宏触发 redundant-decls 错误，c_args 靠前会被后面的 -Werror= 覆盖
+    sed -i 's/-Werror=redundant-decls/-Wno-error=redundant-decls/g' builddir/build.ninja
 
     meson compile -C builddir
 }

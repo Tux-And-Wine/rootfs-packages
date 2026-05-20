@@ -23,10 +23,10 @@ build() {
 
 install() {
     # 安装头文件
-    install -vDm 644 libjbig/*.h -t "${DESTDIR}${PREFIX}/include/"
+    command install -vDm 644 libjbig/*.h -t "${DESTDIR}${PREFIX}/include/"
     # 安装库文件
-    install -vDm 755 "libjbig/libjbig.so.${VERSION}" -t "${DESTDIR}${PREFIX}/lib/"
-    install -vDm 755 "libjbig/libjbig85.so.${VERSION}" -t "${DESTDIR}${PREFIX}/lib/"
+    command install -vDm 755 "libjbig/libjbig.so.${VERSION}" -t "${DESTDIR}${PREFIX}/lib/"
+    command install -vDm 755 "libjbig/libjbig85.so.${VERSION}" -t "${DESTDIR}${PREFIX}/lib/"
     # 创建符号链接
     ln -sf "libjbig.so.${VERSION}" "${DESTDIR}${PREFIX}/lib/libjbig.so"
     ln -sf "libjbig85.so.${VERSION}" "${DESTDIR}${PREFIX}/lib/libjbig85.so"
@@ -49,10 +49,10 @@ install() {
 
 install_target() {
     # 安装头文件
-    install -vDm 644 libjbig/*.h -t "${PREFIX}/include/"
+    command install -vDm 644 libjbig/*.h -t "${PREFIX}/include/"
     # 安装库文件
-    install -vDm 755 "libjbig/libjbig.so.${VERSION}" -t "${PREFIX}/lib/"
-    install -vDm 755 "libjbig/libjbig85.so.${VERSION}" -t "${PREFIX}/lib/"
+    command install -vDm 755 "libjbig/libjbig.so.${VERSION}" -t "${PREFIX}/lib/"
+    command install -vDm 755 "libjbig/libjbig85.so.${VERSION}" -t "${PREFIX}/lib/"
     # 创建符号链接
     ln -sf "libjbig.so.${VERSION}" "${PREFIX}/lib/libjbig.so"
     ln -sf "libjbig85.so.${VERSION}" "${PREFIX}/lib/libjbig85.so"

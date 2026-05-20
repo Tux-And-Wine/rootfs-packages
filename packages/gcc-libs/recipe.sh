@@ -46,7 +46,7 @@ build() {
         --with-system-zlib \
         LD_FOR_TARGET="${TARGET_HOST}-ld"
 
-    make -j$(nproc)
+    make -j$(nproc) || make -j$(nproc)
 }
 
 install() {

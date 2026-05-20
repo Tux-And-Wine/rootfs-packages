@@ -31,9 +31,6 @@ build() {
     endian = 'little'
 	EOF
 
-    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
-    export PKG_CONFIG_SYSROOT_DIR="/data/data/com.winlator/files/imagefs"
-
     meson setup builddir \
         --cross-file cross-aarch64.txt \
         --prefix="${PREFIX}"

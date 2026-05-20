@@ -7,9 +7,6 @@ SRC_URI="https://download.osgeo.org/libtiff/tiff-${VERSION}.tar.xz"
 SRC_DIR="tiff-${VERSION}"
 
 build() {
-    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
-    export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
-
     ./configure \
         --host="${TARGET_HOST}" \
         --build="${BUILD_HOST}" \

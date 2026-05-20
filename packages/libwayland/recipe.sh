@@ -50,6 +50,9 @@ build() {
     # pkg-config 指向宿主机的交叉编译依赖
     export PKG_CONFIG_LIBDIR="/usr/lib/${TARGET_HOST}/pkgconfig:/usr/share/pkgconfig"
 
+    # 临时取消 sysroot，避免 native pkg-config 查询 wayland-scanner 时路径被污染
+    unset PKG_CONFIG_SYSROOT_DIR
+
     meson setup builddir \
         --cross-file cross-aarch64.txt \
         --native-file native.txt \

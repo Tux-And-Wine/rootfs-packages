@@ -11,8 +11,7 @@ build() {
         CC="${TARGET_HOST}-gcc" \
         AR="${TARGET_HOST}-ar" \
         RANLIB="${TARGET_HOST}-ranlib" \
-        PREFIX="${PREFIX}" \
-        lib
+        PREFIX="${PREFIX}"
 }
 
 install() {

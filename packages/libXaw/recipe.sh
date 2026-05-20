@@ -13,9 +13,6 @@ prepare() {
 }
 
 build() {
-    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
-    export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
-
     ./configure \
         --host="${TARGET_HOST}" \
         --build="${BUILD_HOST}" \

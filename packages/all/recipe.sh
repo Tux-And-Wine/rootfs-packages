@@ -51,20 +51,20 @@ ALL_BUILD_ORDER=(
     vulkan-headers
     vulkan-icd-loader
     spirv-headers
-    libspirv-tools
-    libfreetype
+    spirv-tools
+    freetype
     libexpat
-    libfontconfig
-    libpcre2
+    fontconfig
+    pcre2
     glib
     libpixman
     libcairo
-    libfribidi
-    libharfbuzz
+    fribidi
+    harfbuzz
     libdatrie
     libXft
     libthai
-    libpango
+    pango
     libXxf86vm
     libxshmfence
     libjpeg-turbo

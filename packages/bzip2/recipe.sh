@@ -40,13 +40,14 @@ build() {
 
 install() {
     # 模拟安装到 DESTDIR
-    install -dm755 "${DESTDIR}${PREFIX}/share/man/man1"
-    install -dm755 "${DESTDIR}${PREFIX}/bin"
-    install -dm755 "${DESTDIR}${PREFIX}/lib"
-    install -dm755 "${DESTDIR}${PREFIX}/include"
+    # 使用 /usr/bin/install 避免与函数名冲突导致递归
+    /usr/bin/install -dm755 "${DESTDIR}${PREFIX}/share/man/man1"
+    /usr/bin/install -dm755 "${DESTDIR}${PREFIX}/bin"
+    /usr/bin/install -dm755 "${DESTDIR}${PREFIX}/lib"
+    /usr/bin/install -dm755 "${DESTDIR}${PREFIX}/include"
 
-    install -m755 bzip2-shared "${DESTDIR}${PREFIX}/bin/bzip2"
-    install -m755 bzip2recover bzdiff bzgrep bzmore "${DESTDIR}${PREFIX}/bin"
+    /usr/bin/install -m755 bzip2-shared "${DESTDIR}${PREFIX}/bin/bzip2"
+    /usr/bin/install -m755 bzip2recover bzdiff bzgrep bzmore "${DESTDIR}${PREFIX}/bin"
     ln -sf bzip2 "${DESTDIR}${PREFIX}/bin/bunzip2"
     ln -sf bzip2 "${DESTDIR}${PREFIX}/bin/bzcat"
 
@@ -54,9 +55,9 @@ install() {
     ln -sf libbz2.so.${VERSION} "${DESTDIR}${PREFIX}/lib/libbz2.so"
     ln -sf libbz2.so.${VERSION} "${DESTDIR}${PREFIX}/lib/libbz2.so.1"
 
-    install -m644 bzlib.h "${DESTDIR}${PREFIX}/include/"
+    /usr/bin/install -m644 bzlib.h "${DESTDIR}${PREFIX}/include/"
 
-    install -m644 bzip2.1 "${DESTDIR}${PREFIX}/share/man/man1/"
+    /usr/bin/install -m644 bzip2.1 "${DESTDIR}${PREFIX}/share/man/man1/"
     ln -sf bzip2.1 "${DESTDIR}${PREFIX}/share/man/man1/bunzip2.1"
     ln -sf bzip2.1 "${DESTDIR}${PREFIX}/share/man/man1/bzcat.1"
     ln -sf bzip2.1 "${DESTDIR}${PREFIX}/share/man/man1/bzip2recover.1"
@@ -64,13 +65,14 @@ install() {
 
 install_target() {
     # 直接安装到目标 rootfs
-    install -dm755 "${PREFIX}/share/man/man1"
-    install -dm755 "${PREFIX}/bin"
-    install -dm755 "${PREFIX}/lib"
-    install -dm755 "${PREFIX}/include"
+    # 使用 /usr/bin/install 避免与 install 函数名冲突导致递归
+    /usr/bin/install -dm755 "${PREFIX}/share/man/man1"
+    /usr/bin/install -dm755 "${PREFIX}/bin"
+    /usr/bin/install -dm755 "${PREFIX}/lib"
+    /usr/bin/install -dm755 "${PREFIX}/include"
 
-    install -m755 bzip2-shared "${PREFIX}/bin/bzip2"
-    install -m755 bzip2recover bzdiff bzgrep bzmore "${PREFIX}/bin"
+    /usr/bin/install -m755 bzip2-shared "${PREFIX}/bin/bzip2"
+    /usr/bin/install -m755 bzip2recover bzdiff bzgrep bzmore "${PREFIX}/bin"
     ln -sf bzip2 "${PREFIX}/bin/bunzip2"
     ln -sf bzip2 "${PREFIX}/bin/bzcat"
 
@@ -78,9 +80,9 @@ install_target() {
     ln -sf libbz2.so.${VERSION} "${PREFIX}/lib/libbz2.so"
     ln -sf libbz2.so.${VERSION} "${PREFIX}/lib/libbz2.so.1"
 
-    install -m644 bzlib.h "${PREFIX}/include/"
+    /usr/bin/install -m644 bzlib.h "${PREFIX}/include/"
 
-    install -m644 bzip2.1 "${PREFIX}/share/man/man1/"
+    /usr/bin/install -m644 bzip2.1 "${PREFIX}/share/man/man1/"
     ln -sf bzip2.1 "${PREFIX}/share/man/man1/bunzip2.1"
     ln -sf bzip2.1 "${PREFIX}/share/man/man1/bzcat.1"
     ln -sf bzip2.1 "${PREFIX}/share/man/man1/bzip2recover.1"

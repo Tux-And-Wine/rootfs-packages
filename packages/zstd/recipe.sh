@@ -12,10 +12,6 @@ prepare() {
 }
 
 build() {
-    # 设置 pkg-config 搜索路径
-    export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
-    export PKG_CONFIG_SYSROOT_DIR="/data/data/com.winlator/files/imagefs"
-
     cd build/meson
 
     # 创建交叉编译描述文件
@@ -53,11 +49,9 @@ build() {
 }
 
 install() {
-    cd build/meson
     meson install --destdir "$DESTDIR" -C builddir
 }
 
 install_target() {
-    cd build/meson
     meson install -C builddir
 }
