@@ -7,8 +7,8 @@ SRC_URI="https://xorg.freedesktop.org/archive/individual/lib/libxcb-${VERSION}.t
 SRC_DIR="libxcb-${VERSION}"
 
 prepare() {
-    # 安卓路径补丁：Unix socket 路径改为安卓临时目录
-    sed -i 's|/tmp/.X11-unix/X|/data/data/com.winlator/files/imagefs/tmp/.X11-unix/X|g' src/xcb_util.c
+    # Unix socket 路径改为 IMAGEFS_ROOT 下的临时目录
+    sed -i "s|/tmp/.X11-unix/X|$(dirname "${PREFIX}")/tmp/.X11-unix/X|g" src/xcb_util.c
 }
 
 build() {
