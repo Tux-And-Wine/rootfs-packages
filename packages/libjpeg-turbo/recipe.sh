@@ -7,6 +7,9 @@ SRC_URI="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/${VERS
 SRC_DIR="libjpeg-turbo-${VERSION}"
 
 build() {
+    # 清除可能泄漏的环境变量，防止干扰 cmake 编译器检测
+    unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
+
     cat > toolchain-aarch64.cmake <<-CMAKE_EOF
     set(CMAKE_SYSTEM_NAME Linux)
     set(CMAKE_SYSTEM_PROCESSOR aarch64)

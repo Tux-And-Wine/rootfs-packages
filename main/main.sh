@@ -47,6 +47,14 @@ scan_recipes() {
 build_pkg() {
     local pkg_name="$1"
 
+    # ---- 保存环境变量，防止包之间通过 export 泄漏 ----
+    local _entry_CFLAGS="${CFLAGS:-}"
+    local _entry_CXXFLAGS="${CXXFLAGS:-}"
+    local _entry_CPPFLAGS="${CPPFLAGS:-}"
+    local _entry_LDFLAGS="${LDFLAGS:-}"
+    local _entry_CC="${CC:-}"
+    local _entry_CXX="${CXX:-}"
+
     if $REBUILD; then
         clean_pkg "$pkg_name"
     fi
@@ -129,6 +137,14 @@ build_pkg() {
 
     info "$PKGNAME 编译完成，产物目录: $OUTPUT_DIR/$PKGNAME"
     BUILT_PKGS["$pkg_name"]=1
+
+    # ---- 恢复环境变量，防止泄漏到下一个包 ----
+    export CFLAGS="${_entry_CFLAGS}"
+    export CXXFLAGS="${_entry_CXXFLAGS}"
+    export CPPFLAGS="${_entry_CPPFLAGS}"
+    export LDFLAGS="${_entry_LDFLAGS}"
+    export CC="${_entry_CC}"
+    export CXX="${_entry_CXX}"
 }
 
 main() {
