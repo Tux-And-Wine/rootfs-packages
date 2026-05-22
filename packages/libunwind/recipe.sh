@@ -15,7 +15,8 @@ build() {
         --build="${BUILD_HOST}" \
         --prefix="${PREFIX}" \
         --disable-tests \
-        --enable-shared
+        --enable-shared \
+        CFLAGS="-O2"
     make -j$(nproc) || make -j1
 }
 
