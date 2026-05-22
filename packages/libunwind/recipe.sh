@@ -16,7 +16,7 @@ build() {
         --prefix="${PREFIX}" \
         --disable-tests \
         --enable-shared
-    make -j$(nproc)
+    make -j$(nproc) || make -j1
 }
 
 install() {
