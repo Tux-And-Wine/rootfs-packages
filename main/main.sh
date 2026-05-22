@@ -54,6 +54,8 @@ build_pkg() {
     local _entry_LDFLAGS="${LDFLAGS:-}"
     local _entry_CC="${CC:-}"
     local _entry_CXX="${CXX:-}"
+    local _entry_PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR:-}"
+    local _entry_PKG_CONFIG_SYSROOT_DIR="${PKG_CONFIG_SYSROOT_DIR:-}"
 
     if $REBUILD; then
         clean_pkg "$pkg_name"
@@ -145,6 +147,8 @@ build_pkg() {
     export LDFLAGS="${_entry_LDFLAGS}"
     export CC="${_entry_CC}"
     export CXX="${_entry_CXX}"
+    export PKG_CONFIG_LIBDIR="${_entry_PKG_CONFIG_LIBDIR}"
+    export PKG_CONFIG_SYSROOT_DIR="${_entry_PKG_CONFIG_SYSROOT_DIR}"
 }
 
 main() {
