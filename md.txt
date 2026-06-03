@@ -169,6 +169,26 @@
 # BUILD_IN_CONTAINER 标记是否需要在容器/chroot 中构建
 
 # =============================================================================
+#  9.1 远程 Docker 构建模式
+# =============================================================================
+# BUILD_IN_CONTAINER=1 时，主脚本会在本地解析 config.sh 后立即委托到远程
+# Linux Docker 环境执行，避免 macOS/BSD 工具链差异影响构建。
+#
+# 可配置变量：
+# CONTAINER_RUNTIME      容器运行时，默认 docker
+# CONTAINER_REMOTE       远程 SSH 目标，默认 bazzite@192.168.0.100
+# CONTAINER_REMOTE_DIR   远程持久目录，默认 ~/Documents/rootfs-packages-build
+# CONTAINER_IMAGE        构建镜像名，默认 tuxwine-rootfs-builder:ubuntu24
+# CONTAINER_PROXY_URL    网络代理地址，默认 http://192.168.0.102:8080
+# CONTAINER_PROXY_MODE   auto/always/off，默认 auto
+# CONTAINER_REBUILD_IMAGE 设置为 1 时强制重建容器镜像
+#
+# 运行示例：
+#   BUILD_IN_CONTAINER=1 CONTAINER_SSH_PASSWORD=... ./start-build.sh zlib
+#
+# 注意：CONTAINER_SSH_PASSWORD 只从运行环境读取，不要写入 config.sh。
+
+# =============================================================================
 # 10. 开发约定与注意事项
 # =============================================================================
 #  - 配方不要写 #!/bin/bash 或 exit，它只是被 source 的片段。

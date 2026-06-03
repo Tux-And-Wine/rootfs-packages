@@ -12,7 +12,7 @@ set -euo pipefail
 MAIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$MAIN_DIR")"
 
-for lib in common fetch unpack rebuild; do
+for lib in common fetch unpack rebuild container; do
     if [[ -f "${PROJECT_ROOT}/lib/${lib}.sh" ]]; then
         source "${PROJECT_ROOT}/lib/${lib}.sh"
     else
@@ -26,9 +26,15 @@ if [[ -f "${PROJECT_ROOT}/config.sh" ]]; then
 fi
 
 PACKAGES_DIR="${PROJECT_ROOT}/packages"
-DOWNLOAD_DIR="${PROJECT_ROOT}/downloads"
-WORK_DIR="${PROJECT_ROOT}/work"
-OUTPUT_DIR="${PROJECT_ROOT}/output"
+DOWNLOAD_DIR="${DOWNLOAD_DIR:-${PROJECT_ROOT}/downloads}"
+WORK_DIR="${WORK_DIR:-${PROJECT_ROOT}/work}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/output}"
+
+maybe_delegate_to_container "$@"
+
+if (( BASH_VERSINFO[0] < 4 )); then
+    error "当前 Bash 版本过低，需要 Bash 4+；macOS 可设置 BUILD_IN_CONTAINER=1 委托到远程 Linux 构建"
+fi
 
 declare -A PKG_RECIPE_DIR
 declare -A BUILT_PKGS
