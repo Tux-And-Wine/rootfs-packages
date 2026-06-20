@@ -4,6 +4,7 @@
 PKGNAME="dbus"
 VERSION="1.15.6"
 SRC_URI="https://dbus.freedesktop.org/releases/dbus/dbus-${VERSION}.tar.xz"
+SRC_HASH="f97f5845f9c4a5a1fb3df67dfa9e16b5a3fd545d348d6dc850cb7ccc9942bd8c"
 SRC_DIR="dbus-${VERSION}"
 
 prepare() {

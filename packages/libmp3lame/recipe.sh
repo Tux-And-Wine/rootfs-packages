@@ -4,6 +4,7 @@
 PKGNAME="libmp3lame"
 VERSION="3.100"
 SRC_URI="https://downloads.sourceforge.net/project/lame/lame/${VERSION}/lame-${VERSION}.tar.gz"
+SRC_HASH="ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
 SRC_DIR="lame-${VERSION}"
 
 build() {

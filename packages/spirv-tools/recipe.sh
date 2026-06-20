@@ -4,6 +4,7 @@
 PKGNAME="spirv-tools"
 VERSION="2026.1"
 SRC_URI="https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v${VERSION}.tar.gz"
+SRC_HASH="35dc16cf2dc64be5b6bbbe86d210e6f4a82b070cffd751605a3365cd8bce2d7e"
 SRC_DIR="SPIRV-Tools-${VERSION}"
 
 build() {

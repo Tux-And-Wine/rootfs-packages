@@ -4,6 +4,7 @@
 PKGNAME="libdrm"
 VERSION="2.4.124"
 SRC_URI="https://dri.freedesktop.org/libdrm/libdrm-${VERSION}.tar.xz"
+SRC_HASH="ac36293f61ca4aafaf4b16a2a7afff312aa4f5c37c9fbd797de9e3c0863ca379"
 SRC_DIR="libdrm-${VERSION}"
 
 build() {

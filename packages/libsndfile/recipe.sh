@@ -4,6 +4,7 @@
 PKGNAME="libsndfile"
 VERSION="1.2.2"
 SRC_URI="https://github.com/libsndfile/libsndfile/archive/refs/tags/${VERSION}.tar.gz"
+SRC_HASH="ffe12ef8add3eaca876f04087734e6e8e029350082f3251f565fa9da55b52121"
 SRC_DIR="libsndfile-${VERSION}"
 
 prepare() {

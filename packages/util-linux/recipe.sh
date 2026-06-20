@@ -4,6 +4,7 @@
 PKGNAME="util-linux"
 VERSION="2.40.2"
 SRC_URI="https://github.com/util-linux/util-linux/archive/refs/tags/v${VERSION}.tar.gz"
+SRC_HASH="8e5f5de12d1b02d44e2511e5f2c6c36236a5331b1cd915c2f7e8868bac677ace"
 SRC_DIR="util-linux-${VERSION}"
 
 prepare() {

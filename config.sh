@@ -6,7 +6,7 @@ export TARGET_HOST="aarch64-linux-gnu"
 export BUILD_HOST="x86_64-linux-gnu"
 
 # 安装前缀
-export PREFIX="/data/data/a.io.github.ewt45.winemulator/linbox/usr"
+export PREFIX="/data/data/a.io.github.ewt45.winemulator/files/imagefs/usr"
 
 # pkg-config 路径（交叉编译时使用）
 export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"

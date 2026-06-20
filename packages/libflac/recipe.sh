@@ -4,6 +4,7 @@
 PKGNAME="libflac"
 VERSION="1.5.0"
 SRC_URI="https://downloads.xiph.org/releases/flac/flac-${VERSION}.tar.xz"
+SRC_HASH="f2c1c76592a82ffff8413ba3c4a1299b6c7ab06c734dee03fd88630485c2b920"
 SRC_DIR="flac-${VERSION}"
 
 build() {

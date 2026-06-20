@@ -4,6 +4,7 @@
 PKGNAME="libiconv"
 VERSION="1.18"
 SRC_URI="https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${VERSION}.tar.gz"
+SRC_HASH="3b08f5f4f9b4eb82f151a7040bfd6fe6c6fb922efe4b1659c66ea933276965e8"
 SRC_DIR="libiconv-${VERSION}"
 
 build() {

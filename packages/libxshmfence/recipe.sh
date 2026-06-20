@@ -4,6 +4,7 @@
 PKGNAME="libxshmfence"
 VERSION="1.3.3"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libxshmfence-${VERSION}.tar.xz"
+SRC_HASH="d4a4df096aba96fea02c029ee3a44e11a47eb7f7213c1a729be83e85ec3fde10"
 SRC_DIR="libxshmfence-${VERSION}"
 
 build() {

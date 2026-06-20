@@ -4,6 +4,7 @@
 PKGNAME="libpixman"
 VERSION="0.44.2"
 SRC_URI="https://cairographics.org/releases/pixman-${VERSION}.tar.gz"
+SRC_HASH="6349061ce1a338ab6952b92194d1b0377472244208d47ff25bef86fc71973466"
 SRC_DIR="pixman-${VERSION}"
 
 build() {

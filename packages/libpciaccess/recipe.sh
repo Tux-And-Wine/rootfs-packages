@@ -4,6 +4,7 @@
 PKGNAME="libpciaccess"
 VERSION="0.17"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libpciaccess-${VERSION}.tar.xz"
+SRC_HASH="74283ba3c974913029e7a547496a29145b07ec51732bbb5b5c58d5025ad95b73"
 SRC_DIR="libpciaccess-${VERSION}"
 
 build() {

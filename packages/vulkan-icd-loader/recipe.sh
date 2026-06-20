@@ -4,6 +4,7 @@
 PKGNAME="vulkan-loader"
 VERSION="1.3.301"
 SRC_URI="https://github.com/KhronosGroup/Vulkan-Loader/archive/v${VERSION}.tar.gz"
+SRC_HASH="7f6895bb25faaca72b9d75325f1d225ae7f30081d3e81c8c19f2c4556b23d676"
 SRC_DIR="Vulkan-Loader-${VERSION}"
 
 build() {

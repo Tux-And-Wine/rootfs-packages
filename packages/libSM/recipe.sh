@@ -4,6 +4,7 @@
 PKGNAME="libSM"
 VERSION="1.2.5"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libSM-${VERSION}.tar.xz"
+SRC_HASH="2af9e12da5ef670dc3a7bce1895c9c0f1bfb0cb9e64e8db40fcc33f883bd20bc"
 SRC_DIR="libSM-${VERSION}"
 
 build() {

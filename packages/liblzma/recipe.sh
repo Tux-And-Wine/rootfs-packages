@@ -4,6 +4,7 @@
 PKGNAME="liblzma"
 VERSION="5.6.4"
 SRC_URI="https://github.com/tukaani-project/xz/releases/download/v${VERSION}/xz-${VERSION}.tar.xz"
+SRC_HASH="829ccfe79d769748f7557e7a4429a64d06858e27e1e362e25d01ab7b931d9c95"
 SRC_DIR="xz-${VERSION}"
 
 build() {

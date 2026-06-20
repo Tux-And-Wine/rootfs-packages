@@ -4,6 +4,7 @@
 PKGNAME="brotli"
 VERSION="1.1.0"
 SRC_URI="https://github.com/google/brotli/archive/v${VERSION}.tar.gz"
+SRC_HASH="e720a6ca29428b803f4ad165371771f5398faba397edf6778837a18599ea13ff"
 SRC_DIR="brotli-${VERSION}"
 
 build() {

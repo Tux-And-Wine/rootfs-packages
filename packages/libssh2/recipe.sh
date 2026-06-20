@@ -4,6 +4,7 @@
 PKGNAME="libssh2"
 VERSION="1.11.1"
 SRC_URI="https://www.libssh2.org/download/libssh2-${VERSION}.tar.gz"
+SRC_HASH="d9ec76cbe34db98eec3539fe2c899d26b0c837cb3eb466a56b0f109cabf658f7"
 SRC_DIR="libssh2-${VERSION}"
 
 build() {

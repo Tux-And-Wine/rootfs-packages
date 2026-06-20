@@ -4,6 +4,7 @@
 PKGNAME="xtrans"
 VERSION="1.5.2"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/xtrans-${VERSION}.tar.xz"
+SRC_HASH="5c5cbfe34764a9131d048f03c31c19e57fb4c682d67713eab6a65541b4dff86c"
 SRC_DIR="xtrans-${VERSION}"
 
 prepare() {

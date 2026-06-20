@@ -4,6 +4,7 @@
 PKGNAME="bzip2"
 VERSION="1.0.8"
 SRC_URI="https://fossies.org/linux/misc/bzip2-${VERSION}.tar.xz"
+SRC_HASH="47fd74b2ff83effad0ddf62074e6fad1f6b4a77a96e121ab421c20a216371a1f"
 SRC_DIR="bzip2-${VERSION}"
 
 prepare() {

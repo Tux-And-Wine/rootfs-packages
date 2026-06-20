@@ -4,6 +4,7 @@
 PKGNAME="libdatrie"
 VERSION="0.2.13"
 SRC_URI="https://linux.thai.net/pub/thailinux/software/libthai/libdatrie-${VERSION}.tar.xz"
+SRC_HASH="12231bb2be2581a7f0fb9904092d24b0ed2a271a16835071ed97bed65267f4be"
 SRC_DIR="libdatrie-${VERSION}"
 
 build() {

@@ -101,7 +101,7 @@ build_pkg() {
     info "========================================="
 
     local dl_path="$DOWNLOAD_DIR/$src_basename"
-    download "$SRC_URI" "$dl_path"
+    download "$SRC_URI" "$dl_path" "${SRC_HASH:-}"
 
     rm -rf "$pkg_work/src"
     extract "$dl_path" "$pkg_work/src"

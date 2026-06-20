@@ -4,6 +4,7 @@
 PKGNAME="liblz4"
 VERSION="1.10.0"
 SRC_URI="https://github.com/lz4/lz4/archive/v${VERSION}.tar.gz"
+SRC_HASH="537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b"
 SRC_DIR="lz4-${VERSION}"
 
 build() {

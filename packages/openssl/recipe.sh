@@ -4,6 +4,7 @@
 PKGNAME="openssl"
 VERSION="3.4.1"
 SRC_URI="https://github.com/openssl/openssl/releases/download/openssl-${VERSION}/openssl-${VERSION}.tar.gz"
+SRC_HASH="002a2d6b30b58bf4bea46c43bdd96365aaf8daa6c428782aa4feee06da197df3"
 SRC_DIR="openssl-${VERSION}"
 
 build() {

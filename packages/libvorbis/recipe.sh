@@ -4,6 +4,7 @@
 PKGNAME="libvorbis"
 VERSION="1.3.7"
 SRC_URI="http://downloads.xiph.org/releases/vorbis/libvorbis-${VERSION}.tar.xz"
+SRC_HASH="b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b"
 SRC_DIR="libvorbis-${VERSION}"
 
 build() {

@@ -4,6 +4,7 @@
 PKGNAME="libunwind"
 VERSION="1.8.1"
 SRC_URI="https://github.com/libunwind/libunwind/releases/download/v${VERSION}/libunwind-${VERSION}.tar.gz"
+SRC_HASH="ddf0e32dd5fafe5283198d37e4bf9decf7ba1770b6e7e006c33e6df79e6a6157"
 SRC_DIR="libunwind-${VERSION}"
 
 build() {

@@ -4,6 +4,7 @@
 PKGNAME="jbigkit"
 VERSION="2.1"
 SRC_URI="https://www.cl.cam.ac.uk/~mgk25/download/jbigkit-${VERSION}.tar.gz"
+SRC_HASH="de7106b6bfaf495d6865c7dd7ac6ca1381bd12e0d81405ea81e7f2167263d932"
 SRC_DIR="jbigkit-${VERSION}"
 
 prepare() {

@@ -4,6 +4,7 @@
 PKGNAME="vulkan-headers"
 VERSION="1.4.309"
 SRC_URI="https://github.com/KhronosGroup/Vulkan-Headers/archive/v${VERSION}.tar.gz"
+SRC_HASH="437925ada160d86ed763d29dcb9318c1bb0d024d7deaf77bc7c170b8eb6b6f10"
 SRC_DIR="Vulkan-Headers-${VERSION}"
 
 build() {

@@ -4,6 +4,7 @@
 PKGNAME="libharfbuzz"
 VERSION="10.1.0"
 SRC_URI="https://github.com/harfbuzz/harfbuzz/archive/${VERSION}.tar.gz"
+SRC_HASH="c758fdce8587641b00403ee0df2cd5d30cbea7803d43c65fddd76224f7b49b88"
 SRC_DIR="harfbuzz-${VERSION}"
 
 prepare() {

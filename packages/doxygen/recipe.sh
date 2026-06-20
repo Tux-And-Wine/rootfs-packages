@@ -4,6 +4,7 @@
 PKGNAME="doxygen"
 VERSION="1.13.2"
 SRC_URI="https://github.com/doxygen/doxygen/archive/Release_${VERSION//./_}.tar.gz"
+SRC_HASH="4c9d9c8e95c2af4163ee92bcb0f3af03b2a4089402a353e4715771e8d3701c48"
 SRC_DIR="doxygen-Release_${VERSION//./_}"
 
 build() {

@@ -4,6 +4,7 @@
 PKGNAME="libopus"
 VERSION="1.5.2"
 SRC_URI="https://downloads.xiph.org/releases/opus/opus-${VERSION}.tar.gz"
+SRC_HASH="65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1"
 SRC_DIR="opus-${VERSION}"
 
 build() {

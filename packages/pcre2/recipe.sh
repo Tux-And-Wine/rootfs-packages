@@ -4,6 +4,7 @@
 PKGNAME="pcre2"
 VERSION="10.45"
 SRC_URI="https://github.com/PhilipHazel/pcre2/releases/download/pcre2-${VERSION}/pcre2-${VERSION}.tar.bz2"
+SRC_HASH="21547f3516120c75597e5b30a992e27a592a31950b5140e7b8bfde3f192033c4"
 SRC_DIR="pcre2-${VERSION}"
 
 build() {

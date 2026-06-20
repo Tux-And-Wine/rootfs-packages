@@ -4,6 +4,7 @@
 PKGNAME="zstd"
 VERSION="1.5.7"
 SRC_URI="https://github.com/facebook/zstd/archive/v${VERSION}.tar.gz"
+SRC_HASH="37d7284556b20954e56e1ca85b80226768902e2edabd3b649e9e72c0c9012ee3"
 SRC_DIR="zstd-${VERSION}"
 
 prepare() {

@@ -4,6 +4,7 @@
 PKGNAME="spirv-headers"
 VERSION="1.4.341.0"
 SRC_URI="https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/vulkan-sdk-${VERSION}.tar.gz"
+SRC_HASH="cab0a654c4917e16367483296b44cdb1d614e3120c721beafcd37e3a8580486c"
 SRC_DIR="SPIRV-Headers-vulkan-sdk-${VERSION}"
 
 build() {

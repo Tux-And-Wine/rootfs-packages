@@ -4,6 +4,7 @@
 PKGNAME="libjpeg-turbo"
 VERSION="3.1.0"
 SRC_URI="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/${VERSION}/libjpeg-turbo-${VERSION}.tar.gz"
+SRC_HASH="9564c72b1dfd1d6fe6274c5f95a8d989b59854575d4bbee44ade7bc17aa9bc93"
 SRC_DIR="libjpeg-turbo-${VERSION}"
 
 build() {

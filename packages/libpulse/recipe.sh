@@ -4,6 +4,7 @@
 PKGNAME="libpulse"
 VERSION="17.0"
 SRC_URI="https://github.com/pulseaudio/pulseaudio/archive/refs/tags/v${VERSION}.tar.gz"
+SRC_HASH="ed36c8a0cdff7b57382a258d3e1a916f42500fbafd64dd3c2e258ed8f017ee90"
 SRC_DIR="pulseaudio-${VERSION}"
 
 prepare() {

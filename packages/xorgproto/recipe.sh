@@ -4,6 +4,7 @@
 PKGNAME="xorgproto"
 VERSION="2024.1"
 SRC_URI="https://xorg.freedesktop.org/archive/individual/proto/xorgproto-${VERSION}.tar.xz"
+SRC_HASH="372225fd40815b8423547f5d890c5debc72e88b91088fbfb13158c20495ccb59"
 SRC_DIR="xorgproto-${VERSION}"
 
 prepare() {

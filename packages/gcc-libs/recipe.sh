@@ -4,6 +4,7 @@
 PKGNAME="gcc-libs"
 VERSION="14.2.0"
 SRC_URI="https://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.xz"
+SRC_HASH="a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9"
 SRC_DIR="gcc-${VERSION}"
 
 prepare() {

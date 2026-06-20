@@ -4,6 +4,7 @@
 PKGNAME="libglvnd"
 VERSION="1.7.0"
 SRC_URI="https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v${VERSION}/libglvnd-v${VERSION}.tar.gz"
+SRC_HASH="2b6e15b06aafb4c0b6e2348124808cbd9b291c647299eaaba2e3202f51ff2f3d"
 SRC_DIR="libglvnd-v${VERSION}"
 
 build() {

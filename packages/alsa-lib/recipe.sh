@@ -4,6 +4,7 @@
 PKGNAME="alsa-lib"
 VERSION="1.2.13"
 SRC_URI="https://www.alsa-project.org/files/pub/lib/alsa-lib-${VERSION}.tar.bz2"
+SRC_HASH="8c4ff37553cbe89618e187e4c779f71a9bb2a8b27b91f87ed40987cc9233d8f6"
 SRC_DIR="alsa-lib-${VERSION}"
 
 build() {

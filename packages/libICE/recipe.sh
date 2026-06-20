@@ -4,6 +4,7 @@
 PKGNAME="libICE"
 VERSION="1.1.2"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libICE-${VERSION}.tar.xz"
+SRC_HASH="974e4ed414225eb3c716985df9709f4da8d22a67a2890066bc6dfc89ad298625"
 SRC_DIR="libICE-${VERSION}"
 
 prepare() {

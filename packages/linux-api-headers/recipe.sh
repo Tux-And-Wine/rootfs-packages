@@ -4,6 +4,7 @@
 PKGNAME="linux-api-headers"
 VERSION="6.18.7"
 SRC_URI="https://www.kernel.org/pub/linux/kernel/v${VERSION%%.*}.x/linux-${VERSION}.tar.xz"
+SRC_HASH="b726a4d15cf9ae06219b56d87820776e34d89fbc137e55fb54a9b9c3015b8f1e"
 SRC_DIR="linux-${VERSION}"
 
 build() {

@@ -4,6 +4,7 @@
 PKGNAME="libidn2"
 VERSION="2.3.7"
 SRC_URI="https://mirrors.kernel.org/gnu/libidn/libidn2-${VERSION}.tar.gz"
+SRC_HASH="4c21a791b610b9519b9d0e12b8097bf2f359b12f8dd92647611a929e6bfd7d64"
 SRC_DIR="libidn2-${VERSION}"
 
 build() {

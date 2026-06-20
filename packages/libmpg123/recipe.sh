@@ -4,6 +4,7 @@
 PKGNAME="libmpg123"
 VERSION="1.32.10"
 SRC_URI="https://mpg123.org/download/mpg123-${VERSION}.tar.bz2"
+SRC_HASH="87b2c17fe0c979d3ef38eeceff6362b35b28ac8589fbf1854b5be75c9ab6557c"
 SRC_DIR="mpg123-${VERSION}"
 
 build() {

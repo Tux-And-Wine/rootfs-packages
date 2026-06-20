@@ -4,6 +4,7 @@
 PKGNAME="glibc"
 VERSION="2.42"
 SRC_URI="https://ftp.gnu.org/gnu/libc/glibc-${VERSION}.tar.xz"
+SRC_HASH="d1775e32e4628e64ef930f435b67bb63af7599acb6be2b335b9f19f16509f17f"
 SRC_DIR="glibc-${VERSION}"
 
 prepare() {

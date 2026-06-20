@@ -4,6 +4,7 @@
 PKGNAME="ncurses"
 VERSION="6.5"
 SRC_URI="https://ftp.gnu.org/gnu/ncurses/ncurses-${VERSION}.tar.gz"
+SRC_HASH="136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
 SRC_DIR="ncurses-${VERSION}"
 
 build() {
