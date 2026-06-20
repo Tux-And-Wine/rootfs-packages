@@ -18,9 +18,9 @@ build() {
 
 install() {
     make install DESTDIR="$DESTDIR"
-    # 将 Python 模块安装到 DESTDIR 对应的位置
+    # make install DESTDIR=... 会把 xcbgen 安装到 $DESTDIR/tmp/xcbgen-install/xcbgen
     mkdir -p "${DESTDIR}${PREFIX}/lib/python3/dist-packages"
-    cp -r /tmp/xcbgen-install/xcbgen "${DESTDIR}${PREFIX}/lib/python3/dist-packages/"
+    cp -r "${DESTDIR}/tmp/xcbgen-install/xcbgen" "${DESTDIR}${PREFIX}/lib/python3/dist-packages/"
 }
 
 install_target() {
