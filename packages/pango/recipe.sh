@@ -3,6 +3,7 @@
 
 PKGNAME="libpango"
 VERSION="1.54.0"
+DEPENDS="glib harfbuzz freetype fontconfig libthai libXft"
 SRC_URI="https://gitlab.gnome.org/GNOME/pango/-/archive/${VERSION}/pango-${VERSION}.tar.gz"
 SRC_HASH="317f366bb255282d3e64ccf95b1d57cbea8636578b199c158235e1f257e5167f"
 SRC_DIR="pango-${VERSION}"

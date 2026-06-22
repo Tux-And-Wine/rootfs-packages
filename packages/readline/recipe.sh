@@ -3,6 +3,7 @@
 
 PKGNAME="readline"
 VERSION="8.2"
+DEPENDS="ncurses"
 SRC_URI="https://ftp.gnu.org/gnu/readline/readline-${VERSION}.tar.gz"
 SRC_HASH="3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35"
 SRC_DIR="readline-${VERSION}"

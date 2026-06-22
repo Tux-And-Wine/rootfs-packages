@@ -3,6 +3,7 @@
 
 PKGNAME="libxslt"
 VERSION="1.1.42"
+DEPENDS="libxml2"
 SRC_URI="https://download.gnome.org/sources/libxslt/${VERSION%.*}/libxslt-${VERSION}.tar.xz"
 SRC_HASH="85ca62cac0d41fc77d3f6033da9df6fd73d20ea2fc18b0a3609ffb4110e1baeb"
 SRC_DIR="libxslt-${VERSION}"

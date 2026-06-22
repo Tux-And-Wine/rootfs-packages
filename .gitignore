@@ -1,0 +1,65 @@
+# TuxWine 构建系统 .gitignore
+
+# 配置文件（包含本地路径）
+config.sh
+
+# 下载的源码包
+downloads/
+
+# 构建工作目录
+work/
+
+# 构建产物
+output/
+
+# 构建日志
+logs/
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+*~
+
+# 编辑器配置
+.vscode/
+.idea/
+*.sublime-*
+.project
+.settings/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 模板目录（不需要跟踪）
+packages/TEMPLATE/
+
+# 调试文件
+core
+*.core
+vgcore.*
+
+# 编译产物
+*.o
+*.so
+*.a
+*.dylib
+*.dll
+*.exe
+
+# 压缩包
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+*.zip
+*.tgz
+*.tbz2
+*.txz
+
+# 日志文件
+*.log
+
+# 状态文件
+.build_state

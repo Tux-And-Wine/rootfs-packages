@@ -3,6 +3,7 @@
 
 PKGNAME="libXcomposite"
 VERSION="0.4.6"
+DEPENDS="libX11 libXext"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXcomposite-${VERSION}.tar.xz"
 SRC_HASH="fe40bcf0ae1a09070eba24088a5eb9810efe57453779ec1e20a55080c6dc2c87"
 SRC_DIR="libXcomposite-${VERSION}"

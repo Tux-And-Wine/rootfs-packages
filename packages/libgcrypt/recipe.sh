@@ -3,6 +3,7 @@
 
 PKGNAME="libgcrypt"
 VERSION="1.11.0"
+DEPENDS="libgpg-error"
 SRC_URI="https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${VERSION}.tar.bz2"
 SRC_HASH="09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c"
 SRC_DIR="libgcrypt-${VERSION}"

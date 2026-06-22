@@ -3,6 +3,7 @@
 
 PKGNAME="libXxf86vm"
 VERSION="1.1.6"
+DEPENDS="libX11 libXext"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXxf86vm-${VERSION}.tar.xz"
 SRC_HASH="96af414c73ce1d5449ad04be7f9f27fa8330f844b6dda843ef22e3e1befb3ee3"
 SRC_DIR="libXxf86vm-${VERSION}"

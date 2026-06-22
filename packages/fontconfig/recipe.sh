@@ -3,6 +3,7 @@
 
 PKGNAME="fontconfig"
 VERSION="2.15.0"
+DEPENDS="freetype libexpat"
 SRC_URI="https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/${VERSION}/fontconfig-${VERSION}.tar.gz"
 SRC_HASH="cdebb4b805d33e9bdefcc0ef9743db638d2acb21139bbe1a6a85878d4c3e8c9e"
 SRC_DIR="fontconfig-${VERSION}"

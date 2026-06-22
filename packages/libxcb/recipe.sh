@@ -3,6 +3,7 @@
 
 PKGNAME="libxcb"
 VERSION="1.17.0"
+DEPENDS="xcb-proto libXau libXdmcp"
 SRC_URI="https://xorg.freedesktop.org/archive/individual/lib/libxcb-${VERSION}.tar.xz"
 SRC_HASH="599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a59a6d55"
 SRC_DIR="libxcb-${VERSION}"

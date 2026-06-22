@@ -3,6 +3,7 @@
 
 PKGNAME="libcairo"
 VERSION="1.18.2"
+DEPENDS="libpixman freetype fontconfig libX11 libXext libXrender"
 SRC_URI="https://gitlab.freedesktop.org/cairo/cairo/-/archive/${VERSION}/cairo-${VERSION}.tar.bz2"
 SRC_HASH="0b895967abfae888ecad9ace4bce475a27e1b9aaeedaaf334b97c96f13ccc604"
 SRC_DIR="cairo-${VERSION}"

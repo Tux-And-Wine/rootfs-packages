@@ -3,6 +3,7 @@
 
 PKGNAME="xkeyboard-config"
 VERSION="2.43"
+DEPENDS="xorgproto"
 SRC_URI="https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${VERSION}.tar.xz"
 SRC_HASH="c810f362c82a834ee89da81e34cd1452c99789339f46f6037f4b9e227dd06c01"
 SRC_DIR="xkeyboard-config-${VERSION}"

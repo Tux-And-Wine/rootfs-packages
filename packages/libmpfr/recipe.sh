@@ -3,6 +3,7 @@
 
 PKGNAME="libmpfr"
 VERSION="4.2.1"
+DEPENDS="libgmp"
 SRC_URI="https://ftp.gnu.org/gnu/mpfr/mpfr-${VERSION}.tar.xz"
 SRC_HASH="277807353a6726978996945af13e52829e3abd7a9a5b7fb2793894e18f1fcbb2"
 SRC_DIR="mpfr-${VERSION}"

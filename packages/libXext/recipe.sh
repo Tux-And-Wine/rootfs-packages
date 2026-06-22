@@ -3,6 +3,7 @@
 
 PKGNAME="libXext"
 VERSION="1.3.6"
+DEPENDS="libX11"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXext-${VERSION}.tar.xz"
 SRC_HASH="edb59fa23994e405fdc5b400afdf5820ae6160b94f35e3dc3da4457a16e89753"
 SRC_DIR="libXext-${VERSION}"

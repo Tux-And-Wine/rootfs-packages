@@ -1,8 +1,11 @@
-# config.example.sh
-# 复制为 config.sh 并根据你的环境修改
+# config.sh
+# TuxWine 构建系统配置文件
+# 此文件包含本地环境配置，不应纳入版本控制
 
-# 交叉编译目标
+# 交叉编译目标三元组
 export TARGET_HOST="aarch64-linux-gnu"
+
+# 宿主机三元组
 export BUILD_HOST="x86_64-linux-gnu"
 
 # 安装前缀

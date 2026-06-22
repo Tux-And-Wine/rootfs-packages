@@ -3,6 +3,7 @@
 
 PKGNAME="wayland"
 VERSION="1.23.1"
+DEPENDS="libffi libxml2"
 SRC_URI="https://gitlab.freedesktop.org/wayland/wayland/-/releases/${VERSION}/downloads/wayland-${VERSION}.tar.xz"
 SRC_HASH="864fb2a8399e2d0ec39d56e9d9b753c093775beadc6022ce81f441929a81e5ed"
 SRC_DIR="wayland-${VERSION}"

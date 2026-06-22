@@ -1,186 +1,626 @@
-#!/bin/bash
-# =============================================================================
-#  TuxWine 包构建系统 - 开发者参考文档
-#  版本: 0.1.0
-#  最后更新: 2026-05-18
-#  目标受众: 构建系统维护者、配方编写者
-#
-#  用法:
-#    本文件仅供阅读参考，不可执行。
-#    可以复制到项目根目录作为开发手册，或直接阅读注释。
-# =============================================================================
+# TuxWine 包构建系统 - 使用手册
 
-# =============================================================================
-#  1. 设计理念
-# =============================================================================
-#  本构建系统采用"最小化核心 + 独立配方 + 可插拔模块"架构。
-#  - 主脚本 (main/main.sh) 只负责流程编排，不包含具体构建逻辑。
-#  - 公共库 (lib/) 提供可复用的工具函数（日志、下载、解压）。
-#  - 全局配置 (config.sh) 允许一次性设定交叉编译目标、安装前缀等环境变量。
-#  - 包配方 (packages/<包名>/recipe.sh) 以独立脚本形式定义每个软件包的元数据
-#    和构建步骤。
-#
-#  所有变量遵循"就近定义原则"：主脚本定义路径和状态变量，配置脚本定义环境变量，
-#  配方定义包相关变量。变量名采用 UPPER_CASE 风格，环境变量通常大写。
+版本: 1.0.0
+最后更新: 2026-06-22
 
-# =============================================================================
-#  2. 项目目录结构
-# =============================================================================
-#  tuxwine/
-#  ├── main/
-#  │   └── main.sh           # 入口，流程调度
-#  ├── lib/
-#  │   ├── common.sh         # 日志函数 (info, warn, error)
-#  │   ├── fetch.sh          # 下载函数 (download)
-#  │   └── unpack.sh         # 解压函数 (extract)
-#  ├── config.sh             # 可选全局环境变量（交叉编译等）
-#  ├── packages/
-#  │   └── <包名>/
-#  │       ├── recipe.sh     # 包配方（必选）
-#  │       └── patches/      # 可选补丁文件
-#  ├── downloads/            # 源码包缓存（自动管理）
-#  ├── work/                 # 构建工作目录（自动管理）
-#  └── output/               # 最终安装文件树（按包名存放）
+## 目录
 
-# =============================================================================
-#  3. 主脚本变量 (main/main.sh)
-#     所有变量由主脚本定义或使用，用户不应直接修改这些值。
-# =============================================================================
+1. [简介](#1-简介)
+2. [环境准备](#2-环境准备)
+3. [快速开始](#3-快速开始)
+4. [命令参考](#4-命令参考)
+5. [配置说明](#5-配置说明)
+6. [包配方编写](#6-包配方编写)
+7. [项目结构](#7-项目结构)
+8. [故障排除](#8-故障排除)
 
-# ----- 3.1 路径变量 -----
-# MAIN_DIR          主脚本所在目录（绝对路径），即 main/
-# PROJECT_ROOT      项目根目录，即 tuxwine/
-# PACKAGES_DIR      ${PROJECT_ROOT}/packages  存放所有包配方的目录
-# DOWNLOAD_DIR      ${PROJECT_ROOT}/downloads 源码包下载缓存目录
-# WORK_DIR          ${PROJECT_ROOT}/work      构建工作空间
-# OUTPUT_DIR        ${PROJECT_ROOT}/output    最终产物收集目录
+---
 
-# ----- 3.2 内部状态变量 -----
-# PKG_RECIPE_DIR    关联数组: 包名 -> 配方目录路径，由 scan_recipes() 填充
-# BUILT_PKGS        关联数组: 包名 -> 任意非空值，标记本轮已构建成功的包
+## 1. 简介
 
-# ----- 3.3 主脚本内部使用的局部变量（函数内） -----
-# pkg_name          当前正在处理的包名
-# recipe_dir        当前包的配方目录
-# recipe_file       当前包的配方文件完整路径
-# src_basename      从 SRC_URI 提取的源码包文件名
-# src_dir_name      解压后的源码目录名（由 SRC_DIR 决定，未指定则自动推导）
-# pkg_work          当前包在 work/ 下的私有工作目录
-# src_dir           源码解压后的完整路径
-# dest_dir          临时安装根目录（即 DESTDIR）
-# dl_path           下载的源码包存储路径
+TuxWine 包构建系统是一个用于交叉编译软件包的自动化工具，主要用于为 Android Wine 模拟器构建 rootfs 文件系统。
 
-# =============================================================================
-#  4. 全局配置文件变量 (config.sh)
-#     位于项目根目录，可选。如果存在，主脚本会在加载公共库后 source 它。
-#     用于设定整个构建系统的通用环境，所有配方均会继承这些变量。
-# =============================================================================
+### 主要特性
 
-# 变量名                      | 必填 | 说明
-# TARGET_HOST                 推荐   交叉编译的目标三元组，例: aarch64-linux-gnu
-# BUILD_HOST                  推荐   宿主机三元组，例: x86_64-linux-gnu
-# PREFIX                      推荐   软件包的安装前缀，例: /data/.../imagefs/usr
-# PKG_CONFIG_LIBDIR           可选   覆盖 pkg-config 的搜索路径
-# PKG_CONFIG_SYSROOT_DIR      可选   pkg-config 的 sysroot 路径
-# MAKE_INSTALL_PROGRAM        可选   传递给 make install 的额外参数，
-#                                   例: INSTALL_PROGRAM="/usr/bin/install -c"
-#
-# 注意: 这些变量是简单的 shell 变量（非环境变量），配方中可直接使用，
-# 也可在函数内通过 export 提升为环境变量。
+- **自动化构建**: 自动下载、解压、配置、编译、安装软件包
+- **依赖管理**: 自动解析包依赖关系，按正确顺序构建
+- **SHA256 验证**: 验证下载文件的完整性
+- **构建日志**: 自动记录每个包的构建过程
+- **状态持久化**: 记录构建状态，支持断点续传
+- **多种构建系统支持**: 支持 autotools、cmake、meson 等
 
-# =============================================================================
-#  5. 配方文件变量 (packages/<包名>/recipe.sh)
-#     每个包的构建描述文件，以 recipe.sh 命名。主脚本会 source 该文件，
-#     因此它必须是有效的 Bash 脚本片段。
-# =============================================================================
+---
 
-# ----- 5.1 必填变量 -----
-# VERSION           软件版本号，如 "1.5.0"
-# SRC_URI           源码下载链接（支持 http/https），如 https://zlib.net/zlib-1.3.tar.gz
+## 2. 环境准备
 
-# ----- 5.2 可选变量（元数据） -----
-# PKGNAME           包名，默认使用配方所在文件夹名，用于工作目录和输出目录命名
-# SRC_DIR           解压后源码目录名。若不设置，系统会从 SRC_URI 文件名去掉后缀猜测。
-#                   当压缩包内目录名与文件名不一致时务必设置。
-# BUILD_DEPENDS     (当前未使用) 未来用于指定宿主机需安装的构建依赖
-# DEPENDS           (当前未使用) 未来用于指定必须先编译的其他包名
+### 2.1 系统要求
 
-# ----- 5.3 配方内可访问的全局变量 -----
-# 以下变量已在配方被加载时存在，可直接在 build(), install() 等函数中使用：
-# DESTDIR           临时安装根目录，install() 必须安装到 $DESTDIR 下
-# PROJECT_ROOT      项目根路径，可用于引用补丁等资源
-# PREFIX            由 config.sh 提供，建议的安装前缀
-# TARGET_HOST       交叉编译目标三元组
-# BUILD_HOST        宿主机三元组
-# MAKE_INSTALL_PROGRAM  传递给 make install 的额外选项
+- Linux 操作系统 (推荐 Ubuntu/Debian)
+- Bash 4.0+
+- 交叉编译工具链 (aarch64-linux-gnu)
+- 基本构建工具 (gcc, make, cmake, meson 等)
 
-# ----- 5.4 配方必须定义的函数 -----
-# build()           执行配置与编译。在解压源码并执行 prepare() 后被调用。
-# install()         将编译产物安装到 $DESTDIR 下，绝不能安装到系统目录。
-#                   必须支持 DESTDIR 变量。
+### 2.2 安装依赖
 
-# ----- 5.5 可选函数（钩子）-----
-# prepare()         解压源码后、build() 之前调用，用于打补丁、修改构建文件等。
+运行环境设置脚本自动安装所有依赖:
 
-# =============================================================================
-#  6. 环境变量（系统注入与配方可用的约定）
-# =============================================================================
-# DESTDIR           主脚本设置，仅 install() 内有效。
-# PKG_CONFIG_LIBDIR 可由 config.sh 或配方设置，控制 pkg-config 搜索路径。
-# PKG_CONFIG_SYSROOT_DIR  同上，pkg-config 的 sysroot。
-# PATH              系统标准路径，构建工具链应在其中。
-# CC, CXX           交叉编译时通常由工具链设置，配方一般不需修改。
+```bash
+sudo ./setup-environment.sh
+```
 
-# =============================================================================
-#  7. 公共库提供的函数
-# =============================================================================
-# lib/common.sh:
-#   info <msg>      绿色 [INFO] 输出
-#   warn <msg>      黄色 [WARN] 输出
-#   error <msg>     红色 [ERROR] 输出并退出脚本
-#
-# lib/fetch.sh:
-#   download <url> <output_path>  下载文件到指定路径，支持 wget/curl，自动缓存
-#
-# lib/unpack.sh:
-#   extract <archive> <dest_dir>  解压 .tar.gz/.tar.xz/.zip 等到目标目录
+或者跳过确认直接安装:
 
-# =============================================================================
-#  8. 变量继承与作用域示例 (以构建 flac 为例)
-# =============================================================================
-#  1. 用户执行 ./main/main.sh flac
-#  2. 主脚本加载 lib/*.sh，再 source config.sh，此时 shell 中有 TARGET_HOST 等
-#  3. 主脚本 source packages/flac/recipe.sh，获得 VERSION, SRC_URI
-#  4. 主脚本执行 build_pkg flac：
-#     - download "$SRC_URI" "$dl_path"
-#     - extract "$dl_path" "$pkg_work/src"
-#     - 进入 $src_dir
-#     - 执行 prepare (如果存在)
-#     - 执行 build -> 函数内可直接使用 TARGET_HOST, PREFIX 等
-#     - 设置 DESTDIR="$dest_dir" 并导出，执行 install
-#  5. 收集 $dest_dir 内容到 output/flac/
+```bash
+sudo ./setup-environment.sh -y
+```
 
-# =============================================================================
-#  9. 扩展计划中的变量（预留）
-# =============================================================================
-# DEPENDS           声明当前包依赖的其他源码包名，实现自动依赖构建顺序
-# CONFIGURE_EXTRA   数组，存放额外的 configure 参数，供 build() 拼接
-# CCACHE_DIR        指定 ccache 缓存目录，加速重复构建
-# BUILD_IN_CONTAINER 标记是否需要在容器/chroot 中构建
+该脚本会安装:
+- 基本构建工具 (gcc, g++, make, autoconf, automake 等)
+- 构建系统 (cmake, meson, ninja)
+- 下载工具 (wget, curl)
+- 交叉编译工具链 (aarch64-linux-gnu-gcc 等)
 
-# =============================================================================
-# 10. 开发约定与注意事项
-# =============================================================================
-#  - 配方不要写 #!/bin/bash 或 exit，它只是被 source 的片段。
-#  - 配方中的变量名避免与主脚本内部变量冲突（如 pkg_name, recipe_dir 等）。
-#  - 所有需要写入文件系统的操作必须指向 $DESTDIR，绝对不要直接安装到
-#    $PREFIX 对应的系统路径。
-#  - 如果配方需要补丁，应将补丁放在 packages/<包名>/patches/ 下，
-#    并在 prepare() 中通过相对路径使用。
-#  - 下载链接应尽可能使用 HTTPS，且版本号建议通过变量拼接，方便升级。
-#  - 全局配置 config.sh 建议不纳入版本控制（加入 .gitignore），
-#    每个开发者根据自己的环境创建。
+### 2.3 配置
 
-# =============================================================================
-# 本文档将随构建系统的迭代持续更新。如有疑问请参考主脚本源码或联系维护者。
-# =============================================================================
+复制配置模板并编辑:
+
+```bash
+cp config.example.sh config.sh
+vim config.sh
+```
+
+主要配置项:
+
+```bash
+# 交叉编译目标三元组
+export TARGET_HOST="aarch64-linux-gnu"
+
+# 宿主机三元组
+export BUILD_HOST="x86_64-linux-gnu"
+
+# 安装前缀 (目标设备上的路径)
+export PREFIX="/data/data/a.io.github.ewt45.winemulator/files/imagefs/usr"
+
+# pkg-config 路径
+export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
+export PKG_CONFIG_SYSROOT_DIR="$(dirname "${PREFIX}")"
+```
+
+---
+
+## 3. 快速开始
+
+### 3.1 构建单个包
+
+```bash
+./start-build.sh zlib
+```
+
+### 3.2 构建多个包
+
+```bash
+./start-build.sh zlib libffi openssl
+```
+
+### 3.3 构建所有包
+
+```bash
+./start-build.sh all
+```
+
+这会按照依赖顺序构建所有 93 个包。
+
+### 3.4 重建包
+
+如果需要清理后重新构建:
+
+```bash
+./start-build.sh -r zlib
+```
+
+### 3.5 查看可用包
+
+```bash
+./start-build.sh --list
+```
+
+输出示例:
+```
+[INFO] 可用的包:
+
+  - all
+  - alsa-lib (1.2.13)
+  - brotli (1.1.0)
+  - bzip2 (1.0.8)
+  - dbus (1.15.6)
+  ...
+
+[INFO] 共 94 个包
+```
+
+---
+
+## 4. 命令参考
+
+### 4.1 构建命令
+
+| 命令 | 说明 |
+|------|------|
+| `./start-build.sh <包名...>` | 构建指定的包 |
+| `./start-build.sh all` | 构建所有包 |
+| `./start-build.sh -r <包名>` | 清理后重建指定包 |
+
+### 4.2 信息查询命令
+
+| 命令 | 说明 |
+|------|------|
+| `./start-build.sh --list` | 列出所有可用包 |
+| `./start-build.sh --info <包名>` | 显示包的详细信息 |
+| `./start-build.sh --deps <包名>` | 显示包的依赖树 |
+| `./start-build.sh --status` | 显示构建状态 |
+
+示例 - 查看包信息:
+
+```bash
+$ ./start-build.sh --info zlib
+
+[INFO] 包信息: zlib
+
+  版本: 1.3.1
+  源码: https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
+  目录: zlib-1.3.1
+  哈希: 9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23
+  依赖: 无
+  状态: unknown
+  输出: 未构建
+```
+
+示例 - 查看依赖树:
+
+```bash
+$ ./start-build.sh --deps glib
+
+glib
+  libffi
+  libiconv
+  pcre2
+    bzip2
+    liblzma
+```
+
+### 4.3 清理命令
+
+| 命令 | 说明 |
+|------|------|
+| `./start-build.sh --clean` | 清理所有编译产物 |
+| `./start-build.sh --clean-all` | 清理所有内容 (包括下载缓存) |
+| `./start-build.sh --clean-pkg <包名>` | 清理指定包 |
+
+### 4.4 日志命令
+
+| 命令 | 说明 |
+|------|------|
+| `./start-build.sh --log` | 显示最近的构建日志 |
+| `./start-build.sh --log-pkg <包名>` | 显示指定包的日志 |
+| `./start-build.sh --disk` | 显示磁盘使用情况 |
+
+### 4.5 状态管理命令
+
+| 命令 | 说明 |
+|------|------|
+| `./start-build.sh --reset` | 重置所有构建状态 |
+| `./start-build.sh --reset-pkg <包名>` | 重置指定包的状态 |
+
+### 4.6 构建选项
+
+| 选项 | 说明 |
+|------|------|
+| `-r, --rebuild` | 清理后重建指定包 |
+| `-v, --verbose` | 显示详细输出 (调试级别) |
+| `-n, --dry-run` | 模拟运行，不实际执行 |
+| `-k, --keep-going` | 遇到错误继续构建其他包 |
+| `-j, --jobs N` | 并行任务数 (默认: CPU 核心数) |
+
+示例 - 使用详细输出和遇错继续:
+
+```bash
+./start-build.sh -v -k all
+```
+
+示例 - 模拟运行查看构建顺序:
+
+```bash
+./start-build.sh -n all
+```
+
+---
+
+## 5. 配置说明
+
+### 5.1 配置文件
+
+配置文件 `config.sh` 位于项目根目录，包含以下变量:
+
+| 变量 | 必填 | 说明 |
+|------|------|------|
+| `TARGET_HOST` | 推荐 | 交叉编译目标三元组，如 `aarch64-linux-gnu` |
+| `BUILD_HOST` | 推荐 | 宿主机三元组，如 `x86_64-linux-gnu` |
+| `PREFIX` | 推荐 | 安装前缀，如 `/data/.../imagefs/usr` |
+| `PKG_CONFIG_LIBDIR` | 可选 | pkg-config 搜索路径 |
+| `PKG_CONFIG_SYSROOT_DIR` | 可选 | pkg-config sysroot 路径 |
+| `MAKE_INSTALL_PROGRAM` | 可选 | make install 额外参数 |
+| `LOG_LEVEL` | 可选 | 日志级别 (0-4)，默认 3 |
+
+### 5.2 日志级别
+
+| 级别 | 说明 |
+|------|------|
+| 0 | 静默 - 无输出 |
+| 1 | 错误 - 仅显示错误 |
+| 2 | 警告 - 显示警告和错误 |
+| 3 | 信息 - 显示所有信息 (默认) |
+| 4 | 调试 - 显示详细调试信息 |
+
+设置日志级别:
+
+```bash
+export LOG_LEVEL=4
+./start-build.sh zlib
+```
+
+---
+
+## 6. 包配方编写
+
+### 6.1 配方文件结构
+
+每个包的配方位于 `packages/<包名>/recipe.sh`，结构如下:
+
+```bash
+# 必填变量
+VERSION="1.0.0"
+SRC_URI="https://example.com/package-1.0.0.tar.gz"
+
+# 推荐变量
+SRC_HASH="sha256哈希值"
+SRC_DIR="package-1.0.0"  # 可选，解压后的目录名
+DEPENDS="zlib libffi"     # 可选，依赖的包
+
+# 必须定义的函数
+build() {
+    # 配置与编译
+    ./configure --host="${TARGET_HOST}" --prefix="${PREFIX}"
+    make -j$(nproc)
+}
+
+install() {
+    # 安装到 $DESTDIR
+    make DESTDIR="$DESTDIR" install
+}
+
+# 可选函数
+prepare() {
+    # 打补丁、修改构建文件等
+    patch -p1 < "${PROJECT_ROOT}/packages/mypackage/fix.patch"
+}
+
+install_target() {
+    # 直接安装到目标 rootfs
+    make install
+}
+```
+
+### 6.2 配方可访问的变量
+
+在配方中可以直接使用以下变量:
+
+| 变量 | 说明 |
+|------|------|
+| `DESTDIR` | 临时安装根目录，install() 必须安装到此目录下 |
+| `PROJECT_ROOT` | 项目根路径，可用于引用补丁等资源 |
+| `PREFIX` | 安装前缀 |
+| `TARGET_HOST` | 交叉编译目标三元组 |
+| `BUILD_HOST` | 宿主机三元组 |
+
+### 6.3 添加新包
+
+1. 创建包目录:
+
+```bash
+mkdir -p packages/mypackage
+```
+
+2. 创建配方文件:
+
+```bash
+cat > packages/mypackage/recipe.sh << 'EOF'
+PKGNAME="mypackage"
+VERSION="1.0.0"
+SRC_URI="https://example.com/mypackage-1.0.0.tar.gz"
+SRC_HASH="abc123..."
+DEPENDS="zlib"
+
+build() {
+    ./configure --host="${TARGET_HOST}" --prefix="${PREFIX}"
+    make -j$(nproc)
+}
+
+install() {
+    make DESTDIR="$DESTDIR" install
+}
+EOF
+```
+
+3. 如果需要补丁，创建补丁目录:
+
+```bash
+mkdir -p packages/mypackage/patches
+cp fix.patch packages/mypackage/patches/
+```
+
+4. 在 `packages/all/recipe.sh` 中添加包到构建顺序。
+
+### 6.4 构建系统类型
+
+#### Autotools
+
+```bash
+build() {
+    ./configure \
+        --host="${TARGET_HOST}" \
+        --build="${BUILD_HOST}" \
+        --prefix="${PREFIX}" \
+        --disable-static
+    make -j$(nproc)
+}
+
+install() {
+    make DESTDIR="$DESTDIR" install
+}
+```
+
+#### CMake
+
+```bash
+build() {
+    cat > toolchain.cmake << EOF
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+set(CMAKE_C_COMPILER ${TARGET_HOST}-gcc)
+set(CMAKE_CXX_COMPILER ${TARGET_HOST}-g++)
+EOF
+
+    cmake -B build \
+        -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake \
+        -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+    cmake --build build --parallel $(nproc)
+}
+
+install() {
+    cmake --install build --prefix "${DESTDIR}${PREFIX}"
+}
+```
+
+#### Meson
+
+```bash
+build() {
+    cat > cross.txt << EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
+
+    meson setup builddir \
+        --cross-file cross.txt \
+        --prefix="${PREFIX}"
+    meson compile -C builddir
+}
+
+install() {
+    meson install --destdir "$DESTDIR" -C builddir
+}
+```
+
+---
+
+## 7. 项目结构
+
+```
+rootfs-packages/
+├── main/
+│   └── main.sh              # 主脚本，流程调度
+├── lib/
+│   ├── common.sh            # 通用工具函数 (日志、检查等)
+│   ├── fetch.sh             # 下载函数 (支持 SHA256 验证)
+│   ├── unpack.sh            # 解压函数 (支持多种格式)
+│   ├── rebuild.sh           # 清理函数
+│   ├── deps.sh              # 依赖解析函数
+│   ├── log.sh               # 日志管理函数
+│   └── state.sh             # 状态管理函数
+├── packages/
+│   ├── all/
+│   │   └── recipe.sh        # 定义所有包的构建顺序
+│   ├── zlib/
+│   │   ├── recipe.sh        # zlib 包配方
+│   │   └── patches/         # 可选补丁目录
+│   ├── libffi/
+│   │   └── recipe.sh
+│   └── ...                  # 其他包
+├── config.sh                # 本地配置文件 (不纳入版本控制)
+├── config.example.sh        # 配置文件模板
+├── setup-environment.sh     # 环境设置脚本
+├── start-build.sh           # 入口脚本
+├── downloads/               # 源码包缓存 (自动创建)
+├── work/                    # 构建工作目录 (自动创建)
+├── output/                  # 构建产物 (自动创建)
+├── logs/                    # 构建日志 (自动创建)
+└── .gitignore               # Git 忽略规则
+```
+
+### 目录说明
+
+| 目录 | 说明 |
+|------|------|
+| `downloads/` | 下载的源码包缓存，避免重复下载 |
+| `work/` | 构建工作目录，包含解压的源码和临时文件 |
+| `output/` | 最终构建产物，按包名分目录存放 |
+| `logs/` | 构建日志，每个包一个日志文件 |
+
+---
+
+## 8. 故障排除
+
+### 8.1 下载失败
+
+**症状**: `下载失败，已重试 3 次`
+
+**解决方法**:
+1. 检查网络连接
+2. 手动下载源码包到 `downloads/` 目录
+3. 检查下载链接是否有效
+
+### 8.2 哈希验证失败
+
+**症状**: `哈希验证失败`
+
+**解决方法**:
+1. 删除 `downloads/` 中对应的文件
+2. 重新运行构建命令
+
+```bash
+rm downloads/package-1.0.0.tar.gz
+./start-build.sh mypackage
+```
+
+### 8.3 依赖缺失
+
+**症状**: `依赖 xxx 未构建`
+
+**解决方法**:
+1. 先构建依赖包:
+
+```bash
+./start-build.sh xxx
+./start-build.sh mypackage
+```
+
+2. 或者使用 `--deps` 查看依赖树:
+
+```bash
+./start-build.sh --deps mypackage
+```
+
+### 8.4 构建失败
+
+**症状**: 构建过程中出现错误
+
+**解决方法**:
+1. 查看构建日志:
+
+```bash
+./start-build.sh --log-pkg mypackage
+```
+
+2. 或者查看 `logs/` 目录中的日志文件
+
+3. 使用详细输出模式:
+
+```bash
+./start-build.sh -v mypackage
+```
+
+### 8.5 磁盘空间不足
+
+**症状**: 写入失败、磁盘满
+
+**解决方法**:
+1. 查看磁盘使用情况:
+
+```bash
+./start-build.sh --disk
+```
+
+2. 清理编译产物:
+
+```bash
+./start-build.sh --clean
+```
+
+3. 清理所有内容 (包括下载缓存):
+
+```bash
+./start-build.sh --clean-all
+```
+
+### 8.6 权限错误
+
+**症状**: `Permission denied`
+
+**解决方法**:
+1. 确保对项目目录有读写权限
+2. 使用 `chmod` 修改权限:
+
+```bash
+chmod -R u+rw .
+```
+
+### 8.7 循环依赖
+
+**症状**: `检测到循环依赖`
+
+**解决方法**:
+1. 检查配方中的 `DEPENDS` 变量
+2. 确保没有 A 依赖 B、B 依赖 A 的情况
+3. 使用 `--deps` 查看依赖树
+
+---
+
+## 附录 A: 所有可用包列表
+
+系统包含 93 个可构建的包，涵盖以下类别:
+
+**基础库**: zlib, libffi, openssl, bzip2, liblzma, liblz4, zstd
+
+**编译器**: gcc-libs, glibc, linux-api-headers
+
+**XML/网络**: libxml2, libxslt, libcurl, libssh2, libnghttp2
+
+**图形库**: freetype, fontconfig, libcairo, pango, harfbuzz, glib
+
+**X11 库**: libX11, libXext, libXrender, libxcb 等
+
+**音频库**: alsa-lib, libpulse, libogg, libvorbis, libflac, libopus
+
+**Vulkan**: vulkan-headers, vulkan-icd-loader, spirv-headers, spirv-tools
+
+使用 `./start-build.sh --list` 查看完整列表。
+
+---
+
+## 附录 B: 环境变量参考
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `TARGET_HOST` | 交叉编译目标 | aarch64-linux-gnu |
+| `BUILD_HOST` | 宿主机 | x86_64-linux-gnu |
+| `PREFIX` | 安装前缀 | /data/.../usr |
+| `LOG_LEVEL` | 日志级别 | 3 |
+| `BUILD_JOBS` | 并行任务数 | CPU 核心数 |
+
+---
+
+## 附录 C: 开发约定
+
+1. 配方不要写 `#!/bin/bash` 或 `exit`，它只是被 source 的片段
+2. 所有安装操作必须指向 `$DESTDIR`，不要直接安装到 `$PREFIX`
+3. 补丁放在 `packages/<包名>/patches/` 目录下
+4. 下载链接使用 HTTPS，版本号通过变量拼接
+5. 配置文件 `config.sh` 不纳入版本控制

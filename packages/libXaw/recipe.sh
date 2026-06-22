@@ -3,6 +3,7 @@
 
 PKGNAME="libXaw"
 VERSION="1.0.16"
+DEPENDS="libXt libXmu libXpm"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXaw-${VERSION}.tar.xz"
 SRC_HASH="731d572b54c708f81e197a6afa8016918e2e06dfd3025e066ca642a5b8c39c8f"
 SRC_DIR="libXaw-${VERSION}"

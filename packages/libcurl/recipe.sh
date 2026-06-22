@@ -3,6 +3,7 @@
 
 PKGNAME="libcurl"
 VERSION="8.12.1"
+DEPENDS="openssl libssh2 libnghttp2 brotli libpsl"
 SRC_URI="https://github.com/curl/curl/releases/download/curl-${VERSION//./_}/curl-${VERSION}.tar.xz"
 SRC_HASH="0341f1ed97a26c811abaebd37d62b833956792b7607ea3f15d001613c76de202"
 SRC_DIR="curl-${VERSION}"

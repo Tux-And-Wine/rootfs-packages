@@ -3,6 +3,7 @@
 
 PKGNAME="libxml2"
 VERSION="2.13.6"
+DEPENDS="liblzma libiconv"
 SRC_URI="https://download.gnome.org/sources/libxml2/${VERSION%.*}/libxml2-${VERSION}.tar.xz"
 SRC_HASH="f453480307524968f7a04ec65e64f2a83a825973bcd260a2e7691be82ae70c96"
 SRC_DIR="libxml2-${VERSION}"

@@ -3,6 +3,7 @@
 
 PKGNAME="libepoxy"
 VERSION="1.5.10"
+DEPENDS="libglvnd"
 SRC_URI="https://github.com/anholt/libepoxy/archive/refs/tags/${VERSION}.tar.gz"
 SRC_HASH="a7ced37f4102b745ac86d6a70a9da399cc139ff168ba6b8002b4d8d43c900c15"
 SRC_DIR="libepoxy-${VERSION}"

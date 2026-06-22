@@ -3,6 +3,7 @@
 
 PKGNAME="libXfixes"
 VERSION="6.0.1"
+DEPENDS="libX11"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXfixes-${VERSION}.tar.xz"
 SRC_HASH="b695f93cd2499421ab02d22744458e650ccc88c1d4c8130d60200213abc02d58"
 SRC_DIR="libXfixes-${VERSION}"

@@ -3,6 +3,7 @@
 
 PKGNAME="libXi"
 VERSION="1.8.2"
+DEPENDS="libX11 libXext"
 SRC_URI="https://xorg.freedesktop.org/releases/individual/lib/libXi-${VERSION}.tar.xz"
 SRC_HASH="d0e0555e53d6e2114eabfa44226ba162d2708501a25e18d99cfb35c094c6c104"
 SRC_DIR="libXi-${VERSION}"

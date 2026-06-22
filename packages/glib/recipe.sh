@@ -3,6 +3,7 @@
 
 PKGNAME="glib"
 VERSION="2.82.2"
+DEPENDS="libffi libiconv pcre2"
 SRC_URI="https://ftp.gnome.org/pub/gnome/sources/glib/${VERSION%.*}/glib-${VERSION}.tar.xz"
 SRC_HASH="ab45f5a323048b1659ee0fbda5cecd94b099ab3e4b9abf26ae06aeb3e781fd63"
 SRC_DIR="glib-${VERSION}"
