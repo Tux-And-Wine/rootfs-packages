@@ -8,23 +8,25 @@ SRC_HASH="317f366bb255282d3e64ccf95b1d57cbea8636578b199c158235e1f257e5167f"
 SRC_DIR="pango-${VERSION}"
 
 build() {
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = '${TARGET_HOST}-pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
 
-    [properties]
-    needs_exe_wrapper = true
-	EOF
+[properties]
+needs_exe_wrapper = true
+c_args = ['-O2', '-pipe', '-Wno-error=redundant-decls']
+cpp_args = ['-O2', '-pipe', '-Wno-error=redundant-decls']
+EOF
 
     meson setup builddir \
         --cross-file cross-aarch64.txt \
@@ -32,9 +34,6 @@ build() {
         -Dc_link_args="-Wl,--allow-shlib-undefined" \
         -Dintrospection=disabled \
         -Dgtk_doc=false
-
-    # glibc 2.42: __REDIRECT 宏触发 redundant-decls 错误，c_args 靠前会被后面的 -Werror= 覆盖
-    sed -i 's/-Werror=redundant-decls/-Wno-error=redundant-decls/g' builddir/build.ninja
 
     meson compile -C builddir
 }

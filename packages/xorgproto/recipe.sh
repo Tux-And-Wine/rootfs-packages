@@ -17,20 +17,20 @@ prepare() {
 
 build() {
     # 交叉编译描述文件
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = 'pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
-	EOF
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
 
     meson setup builddir \
         --cross-file cross-aarch64.txt \
@@ -41,6 +41,13 @@ build() {
 
 install() {
     meson install --destdir "$DESTDIR" -C builddir
+
+    # 清理不需要的平台扩展头文件
+    rm -rf "${DESTDIR}${PREFIX}/include/X11/extensions/apple"*
+    rm -rf "${DESTDIR}${PREFIX}/include/X11/extensions/windows"*
+    rm -f "${DESTDIR}${PREFIX}/include/X11/extensions/XKBgeom.h"
+    rm -f "${DESTDIR}${PREFIX}/lib/pkgconfig/applewmproto.pc"
+    rm -f "${DESTDIR}${PREFIX}/lib/pkgconfig/windowswmproto.pc"
 }
 
 install_target() {

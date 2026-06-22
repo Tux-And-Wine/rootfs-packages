@@ -9,6 +9,7 @@ SRC_DIR="libXcursor-${VERSION}"
 
 prepare() {
     # 应用光标路径补丁，自动替换占位符为实际 PREFIX
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed "s|@@PREFIX@@|${PREFIX}|g" "$patch" | patch -p1
     done

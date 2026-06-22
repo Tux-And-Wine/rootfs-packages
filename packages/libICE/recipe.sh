@@ -9,6 +9,7 @@ SRC_DIR="libICE-${VERSION}"
 
 prepare() {
     # 应用补丁：将硬链接改为符号链接（避免安卓内核限制）
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         patch -p1 < "$patch"
     done

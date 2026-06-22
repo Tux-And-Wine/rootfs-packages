@@ -24,7 +24,7 @@ build() {
 
 install() {
     # Makefile 不支持 DESTDIR，手动安装到临时目录
-    make install PREFIX="${DESTDIR}${PREFIX}"
+    make install DESTDIR="$DESTDIR" PREFIX="${PREFIX}"
 }
 
 install_target() {

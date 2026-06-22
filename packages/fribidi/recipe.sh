@@ -8,20 +8,20 @@ SRC_HASH="1b1cde5b235d40479e91be2f0e88a309e3214c8ab470ec8a2744d82a5a9ea05c"
 SRC_DIR="fribidi-${VERSION}"
 
 build() {
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = 'pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
-	EOF
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
 
     meson setup builddir \
         --cross-file cross-aarch64.txt \

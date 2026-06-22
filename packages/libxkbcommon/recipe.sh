@@ -8,20 +8,20 @@ SRC_HASH="025c53032776ed850fbfb92683a703048cd70256df4ac1a1ec41ed3455d5d39c"
 SRC_DIR="libxkbcommon-xkbcommon-${VERSION}"
 
 build() {
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = 'pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
-	EOF
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
 
     meson setup builddir \
         --cross-file cross-aarch64.txt \

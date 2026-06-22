@@ -12,6 +12,7 @@ prepare() {
 
     # 应用路径补丁：XDG_RUNTIME_DIR 指向 rootfs 的 /tmp
     # 补丁位于 packages/wayland/patches/setdirs.patch
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed "s|@@IMAGEFS_ROOT@@|${IMAGEFS_ROOT}|g" "$patch" | patch -p1
     done
@@ -19,34 +20,34 @@ prepare() {
 
 build() {
     # 交叉编译文件
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = '${TARGET_HOST}-pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
 
-    [properties]
-    needs_exe_wrapper = true
-	EOF
+[properties]
+needs_exe_wrapper = true
+EOF
 
     # 原生编译文件（用于 wayland-scanner）
-    cat > native.txt <<-EOF
-    [binaries]
-    c = 'gcc'
-    cpp = 'g++'
-    ar = 'ar'
-    strip = 'strip'
-    pkgconfig = 'pkg-config'
-    wayland-scanner = '/usr/bin/wayland-scanner'
-	EOF
+    cat > native.txt <<EOF
+[binaries]
+c = 'gcc'
+cpp = 'g++'
+ar = 'ar'
+strip = 'strip'
+pkgconfig = 'pkg-config'
+wayland-scanner = '/usr/bin/wayland-scanner'
+EOF
 
     # pkg-config 指向宿主机的交叉编译依赖
     export PKG_CONFIG_LIBDIR="/usr/lib/${TARGET_HOST}/pkgconfig:/usr/share/pkgconfig"

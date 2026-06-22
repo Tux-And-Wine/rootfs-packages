@@ -12,6 +12,7 @@ prepare() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
 
     # 1. 应用通用补丁（patches/ 目录下所有 .patch）
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed -e "s|@@PREFIX@@|${PREFIX}|g" \
             -e "s|@@IMAGEFS_ROOT@@|${IMAGEFS_ROOT}|g" \
@@ -48,9 +49,7 @@ prepare() {
 
     # 4. 删除不兼容文件并重命名
     rm -f sysdeps/unix/sysv/linux/aarch64/clone3.S
-    cd sysdeps/unix/sysv/linux/aarch64
-    mv -n syscall.S syscallS.S 2>/dev/null || true
-    cd "${src_dir}"
+    (cd sysdeps/unix/sysv/linux/aarch64 && mv -n syscall.S syscallS.S 2>/dev/null || true)
 }
 
 build() {

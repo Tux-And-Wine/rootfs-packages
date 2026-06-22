@@ -14,34 +14,34 @@ prepare() {
     sed -i "s|/etc/gcrypt/hwf.deny|${PREFIX}/etc/gcrypt/hwf.deny|g" src/hwfeatures.c
 
     # 2. 添加 Android/Termux 随机源
-    cat > .android_sources <<-EOF
-    // Android sources
-    {   "/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
-    {   "/system/xbin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
-    {   "/system/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
-    {   "/system/xbin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
-    {   "/system/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
-    {   "/system/xbin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
-    {   "/system/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },
-    {   "/system/xbin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },
-    {   "/system/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
-    {   "/system/xbin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
-    {   "/system/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
-    {   "/system/xbin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1  },
-    {   "/system/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
-    {   "/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1      },
-    {   "/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1       },
-    {   "/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1      },
-    // Termux sources
-    {   "${PREFIX}/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1 },
-    {   "${PREFIX}/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
-    {   "${PREFIX}/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0 },
-    {   "${PREFIX}/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0 },
-    {   "${PREFIX}/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0 },
-    {   "${PREFIX}/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1 },
-    {   "${PREFIX}/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1 },
-    {   "${PREFIX}/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1 },
-	EOF
+    cat > .android_sources <<EOF
+// Android sources
+{   "/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
+{   "/system/xbin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
+{   "/system/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
+{   "/system/xbin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
+{   "/system/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
+{   "/system/xbin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
+{   "/system/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },
+{   "/system/xbin/df", NULL, SC(1), NULL, 0, 0, 0, 0         },
+{   "/system/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
+{   "/system/xbin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
+{   "/system/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
+{   "/system/xbin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1  },
+{   "/system/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
+{   "/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1      },
+{   "/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1       },
+{   "/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1      },
+// Termux sources
+{   "${PREFIX}/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1 },
+{   "${PREFIX}/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
+{   "${PREFIX}/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0 },
+{   "${PREFIX}/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0 },
+{   "${PREFIX}/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0 },
+{   "${PREFIX}/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1 },
+{   "${PREFIX}/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1 },
+{   "${PREFIX}/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1 },
+EOF
 
     # 插入到 dataSources[] = { 之后
     sed -i '/dataSources\[\] = {/ r .android_sources' random/rndunix.c

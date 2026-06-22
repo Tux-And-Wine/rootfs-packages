@@ -34,18 +34,18 @@ install() {
 
     # 创建 pkg-config 文件
     mkdir -p "${DESTDIR}${PREFIX}/lib/pkgconfig"
-    cat > "${DESTDIR}${PREFIX}/lib/pkgconfig/jbigkit.pc" <<-EOF
-    prefix=${PREFIX}
-    exec_prefix=\${prefix}
-    libdir=\${exec_prefix}/lib
-    includedir=\${prefix}/include
+    cat > "${DESTDIR}${PREFIX}/lib/pkgconfig/jbigkit.pc" <<EOF
+prefix=${PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
 
-    Name: jbigkit
-    Description: JBIG-KIT data compression library
-    Version: ${VERSION}
-    Libs: -L\${libdir} -ljbig
-    Cflags: -I\${includedir}
-	EOF
+Name: jbigkit
+Description: JBIG-KIT data compression library
+Version: ${VERSION}
+Libs: -L\${libdir} -ljbig
+Cflags: -I\${includedir}
+EOF
 }
 
 install_target() {
@@ -60,16 +60,16 @@ install_target() {
 
     # 创建 pkg-config 文件
     mkdir -p "${PREFIX}/lib/pkgconfig"
-    cat > "${PREFIX}/lib/pkgconfig/jbigkit.pc" <<-EOF
-    prefix=${PREFIX}
-    exec_prefix=\${prefix}
-    libdir=\${exec_prefix}/lib
-    includedir=\${prefix}/include
+    cat > "${PREFIX}/lib/pkgconfig/jbigkit.pc" <<EOF
+prefix=${PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
 
-    Name: jbigkit
-    Description: JBIG-KIT data compression library
-    Version: ${VERSION}
-    Libs: -L\${libdir} -ljbig
-    Cflags: -I\${includedir}
-	EOF
+Name: jbigkit
+Description: JBIG-KIT data compression library
+Version: ${VERSION}
+Libs: -L\${libdir} -ljbig
+Cflags: -I\${includedir}
+EOF
 }

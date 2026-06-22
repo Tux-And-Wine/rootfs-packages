@@ -44,5 +44,5 @@ install_target() {
     make install \
         MANDIR="${PREFIX}/share/man" \
         MANSUFFIX=ssl \
-        install_sw install_ssldirs
+        install_sw install_ssldirs install_man_docs
 }

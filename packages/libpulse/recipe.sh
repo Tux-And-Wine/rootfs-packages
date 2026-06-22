@@ -14,6 +14,7 @@ prepare() {
     echo "${VERSION}" > .tarball-version
 
     # 应用路径补丁（自动替换 @@PREFIX@@ 和 @@IMAGEFS_ROOT@@）
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed -e "s|@@PREFIX@@|${PREFIX}|g" \
             -e "s|@@IMAGEFS_ROOT@@|${IMAGEFS_ROOT}|g" \
@@ -25,20 +26,20 @@ build() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
 
     # Meson 交叉编译描述文件
-    cat > cross-aarch64.txt <<-EOF
-    [binaries]
-    c = '${TARGET_HOST}-gcc'
-    cpp = '${TARGET_HOST}-g++'
-    ar = '${TARGET_HOST}-ar'
-    strip = '${TARGET_HOST}-strip'
-    pkgconfig = 'pkg-config'
+    cat > cross-aarch64.txt <<EOF
+[binaries]
+c = '${TARGET_HOST}-gcc'
+cpp = '${TARGET_HOST}-g++'
+ar = '${TARGET_HOST}-ar'
+strip = '${TARGET_HOST}-strip'
+pkgconfig = 'pkg-config'
 
-    [host_machine]
-    system = 'linux'
-    cpu_family = 'aarch64'
-    cpu = 'aarch64'
-    endian = 'little'
-	EOF
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+EOF
 
     export PKG_CONFIG_LIBDIR="${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig"
     export PKG_CONFIG_SYSROOT_DIR="${IMAGEFS_ROOT}"

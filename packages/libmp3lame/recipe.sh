@@ -22,36 +22,36 @@ install() {
 
     # 官方不提供 .pc 文件，手动生成
     mkdir -p "${DESTDIR}${PREFIX}/lib/pkgconfig"
-    cat > "${DESTDIR}${PREFIX}/lib/pkgconfig/lame.pc" <<-EOF
-    prefix=${PREFIX}
-    exec_prefix=\${prefix}
-    libdir=\${exec_prefix}/lib
-    includedir=\${prefix}/include
+    cat > "${DESTDIR}${PREFIX}/lib/pkgconfig/lame.pc" <<EOF
+prefix=${PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
 
-    Name: lame
-    Description: MP3 encoding library
-    Requires:
-    Version: ${VERSION}
-    Libs: -L\${libdir} -lmp3lame
-    Cflags: -I\${includedir}
-	EOF
+Name: lame
+Description: MP3 encoding library
+Requires:
+Version: ${VERSION}
+Libs: -L\${libdir} -lmp3lame
+Cflags: -I\${includedir}
+EOF
 }
 
 install_target() {
     make install INSTALL_PROGRAM="/usr/bin/install -c"
 
     mkdir -p "${PREFIX}/lib/pkgconfig"
-    cat > "${PREFIX}/lib/pkgconfig/lame.pc" <<-EOF
-    prefix=${PREFIX}
-    exec_prefix=\${prefix}
-    libdir=\${exec_prefix}/lib
-    includedir=\${prefix}/include
+    cat > "${PREFIX}/lib/pkgconfig/lame.pc" <<EOF
+prefix=${PREFIX}
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
 
-    Name: lame
-    Description: MP3 encoding library
-    Requires:
-    Version: ${VERSION}
-    Libs: -L\${libdir} -lmp3lame
-    Cflags: -I\${includedir}
-	EOF
+Name: lame
+Description: MP3 encoding library
+Requires:
+Version: ${VERSION}
+Libs: -L\${libdir} -lmp3lame
+Cflags: -I\${includedir}
+EOF
 }

@@ -12,6 +12,7 @@ prepare() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
 
     # 应用补丁（自动替换 @@PREFIX@@ 和 @@IMAGEFS_ROOT@@）
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed -e "s|@@PREFIX@@|${PREFIX}|g" \
             -e "s|@@IMAGEFS_ROOT@@|${IMAGEFS_ROOT}|g" \

@@ -11,6 +11,7 @@ prepare() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
 
     # 应用补丁，将临时目录路径指向 IMAGEFS_ROOT/tmp
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed "s|@@IMAGEFS_ROOT@@|${IMAGEFS_ROOT}|g" "$patch" | patch -p1
     done

@@ -9,6 +9,7 @@ SRC_DIR="gcc-${VERSION}"
 
 prepare() {
     # 1. 应用补丁（自动替换 @@PREFIX@@）
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed "s|@@PREFIX@@|${PREFIX}|g" "$patch" | patch -p1
     done
@@ -47,7 +48,7 @@ build() {
         --with-system-zlib \
         LD_FOR_TARGET="${TARGET_HOST}-ld"
 
-    make -j$(nproc) || make -j$(nproc)
+    make -j$(nproc)
 }
 
 install() {

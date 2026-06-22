@@ -8,6 +8,7 @@ SRC_HASH="731d572b54c708f81e197a6afa8016918e2e06dfd3025e066ca642a5b8c39c8f"
 SRC_DIR="libXaw-${VERSION}"
 
 prepare() {
+    [[ -d "${recipe_dir}/patches" ]] || return 0
     for patch in "${recipe_dir}/patches/"*.patch; do
         sed "s|@@PREFIX@@|${PREFIX}|g" "$patch" | patch -p1
     done
