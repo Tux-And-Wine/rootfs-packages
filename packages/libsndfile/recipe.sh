@@ -10,7 +10,7 @@ SRC_DIR="libsndfile-${VERSION}"
 
 prepare() {
     local IMAGEFS_ROOT="$(dirname "${PREFIX}")"
-    # 将临时目录路径改为 Android rootfs 内的 /tmp
+    # 源码中使用了临时目录占位符，需要替换为实际路径
     sed -i "s|@TERMUX_PREFIX_CLASSICAL@/tmp|${IMAGEFS_ROOT}/tmp|" src/common.c
 }
 

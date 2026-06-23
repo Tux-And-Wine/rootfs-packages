@@ -14,7 +14,7 @@ prepare() {
     sed -i "s|/etc/gcrypt/fips_enabled|${PREFIX}/etc/gcrypt/fips_enabled|g" src/fips.c
     sed -i "s|/etc/gcrypt/hwf.deny|${PREFIX}/etc/gcrypt/hwf.deny|g" src/hwfeatures.c
 
-    # 2. 添加 Android/Termux 随机源
+    # 2. 添加 Android 随机源
     cat > .android_sources <<EOF
 // Android sources
 {   "/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
@@ -33,7 +33,7 @@ prepare() {
 {   "/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1      },
 {   "/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1       },
 {   "/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1      },
-// Termux sources
+// ImageFS sources
 {   "${PREFIX}/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1 },
 {   "${PREFIX}/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
 {   "${PREFIX}/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0 },
